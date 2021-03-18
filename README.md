@@ -4,9 +4,8 @@ Este paquete contiente el nodo de Lidar usado en la competición
 de Eurobot 2020/2021, además incluye una pequeña bateria de test
 para comprobar su funcionamiento.
 
-Author: Javier Ortiz Pérez-Jaraiz -> @javierortiz21
-
-Manteiner: Javier Ortiz Pérez-Jaraiz -> @javierortiz21
+Author: Javier Ortiz Pérez-Jaraiz -> @LesmusTrompiz
+Manteiner: Javier Ortiz Pérez-Jaraiz -> @LesmusTrompiz
 
 
 Dependencias
