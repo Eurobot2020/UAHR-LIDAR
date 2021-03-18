@@ -5,6 +5,7 @@ de Eurobot 2020/2021, además incluye una pequeña bateria de test
 para comprobar su funcionamiento.
 
 Author: Javier Ortiz Pérez-Jaraiz -> @LesmusTrompiz
+
 Manteiner: Javier Ortiz Pérez-Jaraiz -> @LesmusTrompiz
 
 
