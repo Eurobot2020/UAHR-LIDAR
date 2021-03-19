@@ -4,7 +4,7 @@ Este paquete contiente el nodo de Lidar usado en la competición
 de Eurobot 2020/2021, además incluye una pequeña bateria de test
 para comprobar su funcionamiento.
 
-Author: Javier Ortiz Pérez-Jaraiz -> @LesmusTrompiz
+Author: Javier Ortiz Pérez-Jaraiz    -> @LesmusTrompiz
 
 Manteiner: Javier Ortiz Pérez-Jaraiz -> @LesmusTrompiz
 
@@ -15,6 +15,8 @@ Dependencias
 | -------------  | ----------------- |
 | Lidar          | RplidarA2         |
 | ROS            | Noetic or Melodic |
+| UAHRPackages   | UAHmsgs           |
+
 
 Como construir el paquete:
 =====================================================================

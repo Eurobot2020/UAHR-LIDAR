@@ -34,9 +34,9 @@ include_directories(
 )
 catkin_package()
 
-add_executable(uahrlidarNode src/uahrlidar.cpp ${RPLIDAR_SDK_SRC} ${UAHR_SRC})
-target_compile_options (uahrlidarNode PRIVATE -Wall -pedantic)
-target_link_libraries(uahrlidarNode ${catkin_LIBRARIES})
+add_executable(uahr_lidar_node src/uahrlidar.cpp ${RPLIDAR_SDK_SRC} ${UAHR_SRC})
+target_compile_options (uahr_lidar_node PRIVATE -Wall -pedantic)
+target_link_libraries(uahr_lidar_node ${catkin_LIBRARIES})
 
 add_executable(rplidarNode src/node.cpp ${RPLIDAR_SDK_SRC})
 target_link_libraries(rplidarNode ${catkin_LIBRARIES})
@@ -44,7 +44,7 @@ target_link_libraries(rplidarNode ${catkin_LIBRARIES})
 add_executable(rplidarNodeClient src/client.cpp)
 target_link_libraries(rplidarNodeClient ${catkin_LIBRARIES})
 
-install(TARGETS uahrlidarNode  rplidarNode rplidarNodeClient
+install(TARGETS uahr_lidar_node  rplidarNode rplidarNodeClient
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -57,4 +57,3 @@ install(DIRECTORY launch rviz sdk
 
 catkin_add_gtest(lidarlibtest test/LidarLib.cpp ${UAHR_SRC})
 target_link_libraries(lidarlibtest ${catkin_LIBRARIES})
-

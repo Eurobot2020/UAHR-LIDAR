@@ -1,0 +1,2 @@
+objetos_busqueda_sucio: [4,1550, 1550, 850,1000, 1550, 1550, -1000,-850,-1540, -1540, -25,25, -10 , 10, 1000,  1000]
+objetos_triangulacion: [["Baliza_arriba",-1550, 950], ["Baliza_abajo",-1550, -950],["Baliza_intermedia",+1550, 0],["Torre", 0,  1000]]

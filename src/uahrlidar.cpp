@@ -1,42 +1,15 @@
 /*
- *  RPLIDAR ROS NODE
- *
- *  Copyright (c) 2009 - 2014 RoboPeak Team
- *  http://www.robopeak.com
- *  Copyright (c) 2014 - 2016 Shanghai Slamtec Co., Ltd.
- *  http://www.slamtec.com
- *
- */
-/*
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
+    UAHRL LIDAR NODE
+
+    Este nodo se encargar de encontrar 
+    a posibles enemigos dentro del campo 
+    y de encontrar los objetos con los
+    que triangular.
+
+*/
 
 #include "ros/ros.h"
-#include "sensor_msgs/LaserScan.h"
-#include "std_srvs/Empty.h"
 #include "rplidar.h"
-#include "std_msgs/Bool.h"
 #include "geometry_msgs/Pose2D.h"
 
 /////// Mensajes del equipo:
@@ -130,7 +103,6 @@ void publish_scan(ros::Publisher *pub_robots,
                   float  range_max,
                   std::string frame_id)
 {
-    std_msgs::Bool f_freno;
     
     bool  reversed = (angle_max > angle_min);
     float angle_increment;
@@ -368,37 +340,13 @@ bool checkRPLIDARHealth(RPlidarDriver * drv)
     }
 }
 
-bool stop_motor(std_srvs::Empty::Request &req,
-                               std_srvs::Empty::Response &res)
-{
-  if(!drv)
-       return false;
 
-  ROS_DEBUG("Stop motor");
-  drv->stopMotor();
-  return true;
-}
-
-bool start_motor(std_srvs::Empty::Request &req,
-                               std_srvs::Empty::Response &res)
-{
-  if(!drv)
-       return false;
-  if(drv->isConnected())
-  {
-      ROS_DEBUG("Start motor");
-      u_result ans=drv->startMotor();
-  
-      ans=drv->startScan(0,1);
-   }
-   else ROS_INFO("lost connection");
-  return true;
-}
 
 static float getAngle(const rplidar_response_measurement_node_hq_t& node)
 {
     return node.angle_z_q14 * 90.f / 16384.f;
 }
+
 int main(int argc, char * argv[]) 
 {
     ros::init(argc, argv, "rplidar_node");
@@ -446,9 +394,7 @@ int main(int argc, char * argv[])
     ros::Subscriber sub_pose;
     
     // Parametros euroboteros
-    if( nh.searchParam("lado",name_l) 
-        &&
-        nh.searchParam("pose_x",name_x) 
+    if( nh.searchParam("pose_x",name_x) 
         &&
         nh.searchParam("pose_y",name_y)
         &&
@@ -471,7 +417,6 @@ int main(int argc, char * argv[])
                 lfobjects.push_back(ObjSearchData{ejemplos_list[j+1],ejemplos_list[j+2], ejemplos_list[j+3],ejemplos_list[j+4]});
             }
 
-            ROS_INFO("Bien configurado");
             for(int i = 0; i<ejemplos_list[0]; i++)
             {    
                 ROS_INFO("%d",lfobjects[i].x_inf);
@@ -570,8 +515,6 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    ros::ServiceServer stop_motor_service = nh.advertiseService("stop_motor", stop_motor);
-    ros::ServiceServer start_motor_service = nh.advertiseService("start_motor", start_motor);
 
     drv->startMotor();
 
