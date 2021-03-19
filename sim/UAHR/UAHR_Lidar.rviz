@@ -5,7 +5,9 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Grid1/Offset1
-        - /Posavasos_recognized_enemies1
+        - /Pose1
+        - /Objetos1
+        - /Enemigos1
       Splitter Ratio: 0.5
     Tree Height: 341
   - Class: rviz/Selection
@@ -54,49 +56,16 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /simulador/posavasos_marker
-      Name: Posavasos
+      Marker Topic: pose_marker
+      Name: Pose
       Namespaces:
         {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: posavasos_recognized_objects_array
-      Name: Posavasos_triangulate
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: parejitas_recognized_enemy_robot_array
-      Name: Posavasos_enemies
-      Namespaces:
-        LE0: true
-        LE1: true
-        LE2: true
-        LE3: true
-        LE4: true
-        LE5: true
-        LE6: true
-        LE7: true
-        LE8: true
-        LE9: true
-      Queue Size: 100
-      Value: true
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: parejitas_marker
-      Name: Parejitas
-      Namespaces:
-        parejitas: true
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: parejitas_recognized_objects_array
-      Name: Parejitas_triangulate
+      Marker Topic: triangulate_objects
+      Name: Objetos
       Namespaces:
         Baliza_abajo: true
         Baliza_arriba: true
@@ -106,8 +75,8 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: parejitas_recognized_enemy_robot_array
-      Name: Parejitas_enemies
+      Marker Topic: enemy_markers
+      Name: Enemigos
       Namespaces:
         LE0: true
         LE1: true
@@ -119,75 +88,6 @@ Visualization Manager:
         LE7: true
         LE8: true
         LE9: true
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: parejitas_arcos
-      Name: Parejitas_arcos
-      Namespaces:
-        0_chiquito: true
-        0_grande: true
-        1_chiquito: true
-        1_grande: true
-        2_chiquito: true
-        2_grande: true
-        3_chiquito: true
-        3_grande: true
-        4_chiquito: true
-        4_grande: true
-        5_chiquito: true
-        5_grande: true
-        6_chiquito: true
-        6_grande: true
-        7_chiquito: true
-        7_grande: true
-        8_chiquito: true
-        8_grande: true
-        9_chiquito: true
-        9_grande: true
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: posavasos_arcos
-      Name: Posavasos_arcos
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: posavasos_correct_objects_array
-      Name: Posavasos_reconized_objects
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: parejitas_correct_objects_array
-      Name: Parejitas_reconized_objects
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: parejitas_recognized_enemy_robot_array
-      Name: Parejitas_recognized_enemies
-      Namespaces:
-        LE0: true
-        LE1: true
-        LE2: true
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: posavasos_recognized_enemy_robot_array
-      Name: Posavasos_recognized_enemies
-      Namespaces:
-        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -225,17 +125,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -7.919459819793701
-        Y: 3.1686480045318604
-        Z: 5.702981472015381
+        X: -2.324145555496216
+        Y: 5.200861930847168
+        Z: 7.810349464416504
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7202070951461792
+      Pitch: 1.0202075242996216
       Target Frame: <Fixed Frame>
-      Yaw: 2.708110809326172
+      Yaw: 1.76311194896698
     Saved:
       - Class: rviz/Orbit
         Distance: 30

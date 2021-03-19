@@ -77,18 +77,16 @@ if __name__ == "__main__":
     
     pub_robot_marker_pose  = rospy.Publisher("pose_marker", Marker, queue_size = 10)
     pub_recognized_objects = rospy.Publisher("triangulate_objects",MarkerArray, queue_size = 10)
-    pub_recognized_robots = rospy.Publisher("enemy_markers",MarkerArray, queue_size = 10)
+    pub_recognized_robots  = rospy.Publisher("enemy_markers",MarkerArray, queue_size = 10)
 
     pub_pose  = rospy.Publisher("pose",Pose2D, queue_size = 10)
 
     SF = 100 # Factor de escalado     
 
-
     all_objects = MarkerArray()
     all_objectives = MarkerArray()
     all_enemies = MarkerArray()
     flechas_velocidad = MarkerArray()
-
 
     robot_marker = new_cube(SF,"robot",pose, size(144,300,350),'b')        
 
@@ -105,6 +103,6 @@ if __name__ == "__main__":
     for i in enemy_line_list:
         line_to_object = new_line(i,Point(0,0,0),Point(0,-1,0),'r')
         all_enemies.markers.append(line_to_object)
-
-    pub_pose.publish(pose)    
+    time.sleep(1)
+    pub_robot_marker_pose.publish(robot_marker)    
     rospy.spin()

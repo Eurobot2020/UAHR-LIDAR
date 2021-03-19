@@ -13,7 +13,7 @@
         <param name="pose_x"              type="int"    value="0"/>
         <param name="pose_y"              type="int"    value="0"/>
         <param name="pose_alfa"           type="int"    value="0"/>
-        <rosparam command="load"          file="$(find rviz_demos)/config/coordenadas_amarillo.yaml" />
+        <rosparam command="load"          file="$(find uahr_lidar)/config/yamls/coordenadas_amarillo.yaml" />
         <param name="modo"                type="string"     value="demo"/>
 
     </group>
