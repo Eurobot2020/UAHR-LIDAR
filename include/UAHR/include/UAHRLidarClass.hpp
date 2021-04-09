@@ -13,6 +13,12 @@
 #define N_OBJETOS  6    
 #define MAX_DISANCE_ENEMY 3100
 
+#define BALIZA_ALIADA_I  1
+#define BALIZA_ALIADA_S  2
+#define TORRE            3
+#define BALIZA_ENEMIGA   4
+
+
 // Estructuras
 struct pose
 {
@@ -69,13 +75,12 @@ struct ObjSearchData
     const int y_sup;
     int aexp;
     const float dexp;
-    const int id;
 
-
-    ObjSearchData(int x_i,int x_s, int y_i, int y_s,int _id): 
+    ObjSearchData(int x_i,int x_s, int y_i, int y_s) : 
         x_inf{x_i}, x_sup{x_s}, y_inf{y_i}, 
-        y_sup{y_s}, aexp{FA},dexp{FD},id{_id}{}
+        y_sup{y_s}, aexp{FA},dexp{FD}{}
 };
+
 struct FiltroAngular
 {
     struct CoronaCircular rpose;     
@@ -84,29 +89,22 @@ struct FiltroAngular
     bool   salto;
 
     // Constructores:
-    FiltroAngular(void) : rpose(),motivo{ROBOT},salto{false},tipo{0}{}
-    FiltroAngular(Seccion _arco): 
-    rpose(_arco),motivo{ROBOT},salto{false},tipo{0}{}
-    FiltroAngular(char _motivo, int _objeto): 
-    rpose{},motivo{_motivo},tipo{_objeto},salto(false){}
-
+    FiltroAngular() : rpose(),motivo{ROBOT},salto{false},tipo{0}{}
+    
+    FiltroAngular(Seccion _arco, char _motivo, int _objeto) : 
+    rpose(_arco),motivo{ROBOT},tipo{_objeto},salto(false){}
     
     FiltroAngular(Seccion _arco, float _dist, char _motivo, int _objeto) : 
     rpose(_arco,_dist),motivo{ROBOT},tipo{_objeto},salto{false}{}
-    FiltroAngular(Seccion _arco,Seccion _dist, char _motivo, int _objeto,bool _salto) : 
-    rpose(_arco,_dist),motivo{ROBOT},tipo{_objeto},salto{_salto}{}
-
+    
     // Operadores
     friend bool operator== (const FiltroAngular one,const FiltroAngular two);
 };
+
+
 using VFiltros = std::vector<FiltroAngular>;
+using VObjetos = std::vector<FiltroAngular>;
 
-
-
-using VObjetos = std::vector<ObjSearchData>;
-using VFiltros = std::vector<FiltroAngular>;
-
-/*
 class LidarHandler
 {
     private:
@@ -131,21 +129,19 @@ LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p)
 
 UAHR::~UAHR()
 {}
-*/
+
 
 
 float M180(float angle);
 bool Compare_FiltroAngular(FiltroAngular a1, FiltroAngular a2);
 struct CoronaCircular near_objects_pose(const struct pose *r_pose,const struct ObjSearchData *p_obj);
-void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &vf);
-void DangerAngles1C(const pose &pr, VFiltros &vdf);
-void DangerAngles2C(const pose &pr, VFiltros &vdf);
-void DangerAngles3C(const pose &pr, VFiltros &vdf);
-void DangerAngles4C(const pose &pr, VFiltros &vdf);
-
+struct CoronaCircular ObjectsAngles(const struct pose *r_pose,const struct ObjSearchData *p_obj);
+VFiltros DangerAngles1C(const struct pose *pr);
+VFiltros DangerAngles2C(const struct pose *pr);
+VFiltros DangerAngles3C(const struct pose *pr);
+VFiltros DangerAngles4C(const struct pose *pr);
 void DesacoploAngulos(VFiltros &VObjRdistance);
-VFiltros new_filters(pose const &robot,VObjetos &lfobjects);
-
+VFiltros  update_filters (const pose *robot);
 
 extern std::vector<ObjSearchData> lfobjects;
 extern int fil_angular [4];

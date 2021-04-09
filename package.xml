@@ -7,7 +7,7 @@
   <maintainer email="robotics@uah.es">Slamtec ROS Maintainer</maintainer>
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>uah_msgs</build_depend>
+  <build_depend>uahr_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>sensor_msgs</build_depend>
@@ -16,6 +16,6 @@
   <run_depend>rosconsole</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>std_srvs</run_depend>
-  <run_depend>uah_msgs</run_depend>
+  <run_depend>uahr_msgs</run_depend>
 
 </package>

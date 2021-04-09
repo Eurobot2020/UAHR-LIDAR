@@ -13,10 +13,10 @@
 #include "geometry_msgs/Pose2D.h"
 
 /////// Mensajes del equipo:
-#include "uah_msgs/Polar.h"
-#include "uah_msgs/PolarArray.h"
-#include "uah_msgs/Arco_Interes.h"
-#include "uah_msgs/array_arcos.h"
+#include "uahr_msgs/Polar.h"
+#include "uahr_msgs/PolarArray.h"
+#include "uahr_msgs/Arco_Interes.h"
+#include "uahr_msgs/array_arcos.h"
 
 #include <math.h>
 #include "UAHRLidarlib.hpp"
@@ -57,7 +57,7 @@ void cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
 
     // Almaceno la posición del robot
     struct pose robot(msg->x,msg->y,msg->theta);    
-    VObjRdistance = update_filters(&robot);
+    VObjRdistance = new_filters(robot,lfobjects);
 }
 void cb_pose_promt(const geometry_msgs::Pose2D::ConstPtr& msg)
 {
@@ -70,13 +70,13 @@ void cb_pose_promt(const geometry_msgs::Pose2D::ConstPtr& msg)
     // Almaceno la posición del robot
     
     struct pose robot;
-    uah_msgs::Arco_Interes arc_aux; 
-    uah_msgs::array_arcos aarray;
+    uahr_msgs::Arco_Interes arc_aux; 
+    uahr_msgs::array_arcos aarray;
     robot.x = msg->x;
     robot.y = msg->y;
     robot.theta = M180(msg->theta);
     
-    VObjRdistance = update_filters(&robot);
+    VObjRdistance = new_filters(robot,lfobjects);
         
     
     
@@ -111,7 +111,7 @@ void publish_scan(ros::Publisher *pub_robots,
     int   x;
     float aux;
 
-    uah_msgs::PolarArray VPA;
+    uahr_msgs::PolarArray VPA;
 
     int   pose_objeto[4][3] = {0};
     float read_value = 0;
@@ -133,7 +133,7 @@ void publish_scan(ros::Publisher *pub_robots,
 
     // Soy culpable de esto    
     aux = 0;    
-    uah_msgs::Polar robot_cluster;
+    uahr_msgs::Polar robot_cluster;
     
     // Analiza los datos:
     if (!reverse_data) {
@@ -414,7 +414,7 @@ int main(int argc, char * argv[])
         {
             for(int j=0; j<ejemplos_list[0]*4; j=j+4)
             {
-                lfobjects.push_back(ObjSearchData{ejemplos_list[j+1],ejemplos_list[j+2], ejemplos_list[j+3],ejemplos_list[j+4]});
+                lfobjects.push_back(ObjSearchData{ejemplos_list[j+1],ejemplos_list[j+2], ejemplos_list[j+3],ejemplos_list[j+4],0});
             }
 
             for(int i = 0; i<ejemplos_list[0]; i++)
@@ -433,7 +433,7 @@ int main(int argc, char * argv[])
         if(modo=="demo")
         {
             sub_pose   = nh.subscribe("pose", 1000, cb_pose_promt);
-            pub_arcos  = nh.advertise<uah_msgs::array_arcos>("arcos", 1000);
+            pub_arcos  = nh.advertise<uahr_msgs::array_arcos>("arcos", 1000);
             ROS_INFO("Configure demo");
         }
         else
@@ -453,8 +453,8 @@ int main(int argc, char * argv[])
 
  
     // Eurobot publishers:
-    ros::Publisher  pub_robots = nh.advertise<uah_msgs::PolarArray>("lidar_robots", 1000);
-    ros::Publisher  pub_objs   = nh.advertise<uah_msgs::PolarArray>("lidar_distance", 1000);
+    ros::Publisher  pub_robots = nh.advertise<uahr_msgs::PolarArray>("lidar_robots", 1000);
+    ros::Publisher  pub_objs   = nh.advertise<uahr_msgs::PolarArray>("lidar_distance", 1000);
 
     
     struct pose robot;
@@ -463,7 +463,7 @@ int main(int argc, char * argv[])
     robot.theta = ptheta;
     
     ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");
-    VObjRdistance = update_filters(&robot);
+    VObjRdistance = new_filters(robot, lfobjects);
     ROS_INFO("Configure finish");
 
 
