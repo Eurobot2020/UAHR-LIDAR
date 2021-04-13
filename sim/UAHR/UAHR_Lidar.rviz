@@ -8,6 +8,7 @@ Panels:
         - /Pose1
         - /Objetos1
         - /Enemigos1
+        - /Filters1
       Splitter Ratio: 0.5
     Tree Height: 341
   - Class: rviz/Selection
@@ -59,7 +60,7 @@ Visualization Manager:
       Marker Topic: pose_marker
       Name: Pose
       Namespaces:
-        {}
+        robot: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -88,6 +89,14 @@ Visualization Manager:
         LE7: true
         LE8: true
         LE9: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: rviz_robot_filters
+      Name: Filters
+      Namespaces:
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -125,17 +134,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -2.324145555496216
-        Y: 5.200861930847168
-        Z: 7.810349464416504
+        X: 3.536952257156372
+        Y: 6.825789928436279
+        Z: 12.917723655700684
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0202075242996216
+      Pitch: 0.6802074909210205
       Target Frame: <Fixed Frame>
-      Yaw: 1.76311194896698
+      Yaw: 2.5881121158599854
     Saved:
       - Class: rviz/Orbit
         Distance: 30

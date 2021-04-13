@@ -395,8 +395,8 @@ VFiltros DangerAngles4C(const struct pose *pr)
     {
         FX_fin  = RAD2DEG(acos((LIMX - pr->x)/DISTANCIA_SEGURIDAD));
         FX_init = -FX_fin;
-        aux_filter[n].start = FX_init;
-        aux_filter[n].end   = FX_fin;
+        aux_filter[n].start = FX_fin;
+        aux_filter[n].end   = FX_init;
         n++;
     }
     

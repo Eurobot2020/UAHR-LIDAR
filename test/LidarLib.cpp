@@ -189,6 +189,14 @@ TEST(UAHRLidar, UAHRLidar_DangerAngles2_Test)
     EXPECT_EQ(DangerAngles2C(&robot)[0],
         FiltroAngular(Seccion(-126,23),
         ROBOT,0));
+    robot.x = -1500;
+    robot.y = 0;
+    robot.theta = 0;
+    
+    EXPECT_EQ(DangerAngles2C(&robot)[0],
+            FiltroAngular(Seccion(-90,90),
+            ROBOT,0));
+
 
 }
 
@@ -262,6 +270,24 @@ TEST(UAHRLidar, UAHRLidar_DangerAngles3_Test)
     EXPECT_EQ(DangerAngles3C(&robot)[0],
         FiltroAngular(Seccion(-23,126),
         ROBOT,0));
+
+    robot.x = -1500;
+    robot.y = 0;
+    robot.theta = 0;
+    
+    EXPECT_EQ(DangerAngles3C(&robot)[0],
+            FiltroAngular(Seccion(-90,90),
+            ROBOT,0));
+
+        robot.x = 0;
+    robot.y = -1000;
+    robot.theta = 0;
+    
+    EXPECT_EQ(DangerAngles3C(&robot)[0],
+            FiltroAngular(Seccion(0,180),
+            ROBOT,0));
+          
+
 }
 
 
@@ -339,6 +365,18 @@ TEST(UAHRLidar, UAHRLidar_DangerAngles4_Test)
     EXPECT_EQ(DangerAngles4C(&robot)[1],
         FiltroAngular(Seccion(53,180),
         ROBOT,0));
+
+    robot.x = 1500;
+    robot.y = 0;
+    robot.theta = 0;
+    
+    EXPECT_EQ(DangerAngles4C(&robot)[0],
+            FiltroAngular(Seccion(-180,-90),
+            ROBOT,0));
+          EXPECT_EQ(DangerAngles4C(&robot)[1],
+            FiltroAngular(Seccion(90,180),
+            ROBOT,0));
+
 }
 
 TEST(UAHRLidar, UAHRObjectsAngles)
