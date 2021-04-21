@@ -68,7 +68,10 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
     */ 
 
     float aoi, aos,adiff,dxi,dyi,di,ds,dxs,dys;
-    FiltroAngular const &f = vf.emplace_back(OBJETO,pasive_obj.id);     
+    // Intento construir el elemento directamente,
+    // en el heap
+    vf.emplace_back(OBJETO,pasive_obj.id);     
+    FiltroAngular &f = vf.back();
 
     // Calculo la distancia desde el observador
     // hasta las distintas partes del objeto:
@@ -115,7 +118,7 @@ void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf){
     // a -180 hay que partirlos
     if(f.rpose.arco.start > f.rpose.arco.end)                   
     {
-        vdf.push_back(FiltroAngular(
+        vdf.emplace_back(FiltroAngular(
             Seccion(f.rpose.arco.start,180),
             f.rpose.distance,
             f.motivo,
@@ -254,6 +257,8 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
     float fx = 0;
     float fy = 0;
 
+
+    // TODO ERROR CALCULATING
     // Calculo los angulos que hay que filtrar:
     if((LIMX - pr.x) < DISTANCIA_SEGURIDAD) 
     {
@@ -408,7 +413,7 @@ VFiltros new_filters(pose const &robot,VObjetos &lfobjects ){
     // Calculo donde espero ver los objetos
     std::for_each(lfobjects.begin(),lfobjects.end(),[&](ObjSearchData  obj)
     {
-        ObjectsAngles(robot,obj);
+        ObjectsAngles(robot,obj,VObjRdistance);
     });
 
     // Cambio todos los ángulosa ángulos relativos:
