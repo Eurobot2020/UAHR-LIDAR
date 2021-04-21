@@ -84,9 +84,9 @@ struct FiltroAngular
     bool   salto;
 
     // Constructores:
-    FiltroAngular(void) : rpose(),motivo{ROBOT},salto{false},tipo{0}{}
+    FiltroAngular(void) : rpose(),motivo{ROBOT},tipo{0},salto{false}{}
     FiltroAngular(Seccion _arco): 
-    rpose(_arco),motivo{ROBOT},salto{false},tipo{0}{}
+    rpose(_arco),motivo{ROBOT},tipo{0},salto{false}{}
     FiltroAngular(char _motivo, int _objeto): 
     rpose{},motivo{_motivo},tipo{_objeto},salto(false){}
 

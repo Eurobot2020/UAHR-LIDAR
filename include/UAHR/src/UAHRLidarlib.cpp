@@ -118,13 +118,14 @@ void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf){
     // a -180 hay que partirlos
     if(f.rpose.arco.start > f.rpose.arco.end)                   
     {
-        vdf.emplace_back(FiltroAngular(
-            Seccion(f.rpose.arco.start,180),
-            f.rpose.distance,
-            f.motivo,
-            f.tipo,
-            true
-            ));        
+        if(f.rpose.arco.start != 180)
+            vdf.emplace_back(FiltroAngular(
+                Seccion(f.rpose.arco.start,180),
+                f.rpose.distance,
+                f.motivo,
+                f.tipo,
+                true
+                ));        
         f.rpose.arco.start = -180;
         f.salto = true;
     }
@@ -147,18 +148,18 @@ void DangerAngles1C(const pose &pr, VFiltros &vdf)
     if((LIMX - pr.x) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(fx,-fx));
+        vdf.emplace_back(Seccion(fx,-fx));
     }
     if((LIMY - pr.y)< DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(fy-180,fy));
+        vdf.emplace_back(Seccion(180-fy,fy));
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.push_back(Seccion(-180,180));
+        vdf.emplace_back(Seccion(-180,180));
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
@@ -185,18 +186,18 @@ void DangerAngles2C(const pose &pr, VFiltros &vdf)
     if((pr.x + LIMX) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((-LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(-fx,fx));
+        vdf.emplace_back(Seccion(-fx,fx));
     }
     if((LIMY - pr.y) < DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(180-fy,fy));
+        vdf.emplace_back(Seccion(180-fy,fy));
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.push_back(Seccion(-180,180));
+        vdf.emplace_back(Seccion(-180,180));
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
@@ -226,23 +227,24 @@ void DangerAngles3C(const pose &pr, VFiltros &vdf)
     if((pr.x + LIMX) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((-LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(-fx,fx));
+        vdf.emplace_back(Seccion(-fx,fx));
     }
     if((pr.y + LIMY) < DISTANCIA_SEGURIDAD) 
     {
         fy  = RAD2DEG(asin((-LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(fy,-180 - fy));        
+        vdf.emplace_back(Seccion(fy,-180 - fy));        
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.push_back(Seccion(-180,180));
+        vdf.emplace_back(Seccion(-180,180));
         return;
     }
     else if((vdf.size()==2) && (vdf[0].rpose.arco.start >= vdf[1].rpose.arco.end))
     {
         vdf[0].rpose.arco.start = vdf[1].rpose.arco.start;
+        vdf.pop_back();
     }
     return;
 }
@@ -258,48 +260,35 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
     float fy = 0;
 
 
-    // TODO ERROR CALCULATING
+    // TODO PUEDE HABER UN ERROR DE CÁLCULO CALCULATING
     // Calculo los angulos que hay que filtrar:
     if((LIMX - pr.x) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(fx,-fx));
+        vdf.emplace_back(Seccion(fx,-fx));
     }
     if((pr.y + LIMY) < DISTANCIA_SEGURIDAD) 
     {
         fy  = RAD2DEG(asin((-LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.push_back(Seccion(fy,-180 - fy));        
+        vdf.emplace_back(Seccion(fy,-180 - fy));        
     }
 
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.push_back(Seccion(-180,180));
+        vdf.emplace_back(Seccion(-180,180));
         return;
     }
     else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
     {
         vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;
+        vdf.pop_back();
     }
     return;
 }
 
 
-bool operator== (const Seccion one, const  Seccion two) {
-    return ((int)one.start == (int)two.start && (int)one.end == (int)two.end);
-}
-Seccion operator+(const Seccion one, const  Seccion two) {
-    return Seccion(one.start + two.start, one.end + two.end);
-}
-bool operator== (const CoronaCircular one, const  CoronaCircular two) {
-    return (one.arco == two.arco && one.distance == two.distance);
-}
-bool operator== (const FiltroAngular one,const FiltroAngular two) {
-    return (one.rpose == two.rpose 
-        && one.motivo == two.motivo 
-        && one.tipo == two.tipo);
-}
 
 
 void DesacoploAngulos(VFiltros &VObjRdistance)
@@ -490,4 +479,22 @@ void ExpandirFiltroSinSalto(VFiltros &filtros, int objeto){
         }
     } 
     // 
+}
+
+
+// Funciones para los tests:
+
+bool operator== (const Seccion one, const  Seccion two) {
+    return ((int)one.start == (int)two.start && (int)one.end == (int)two.end);
+}
+Seccion operator+(const Seccion one, const  Seccion two) {
+    return Seccion(one.start + two.start, one.end + two.end);
+}
+bool operator== (const CoronaCircular one, const  CoronaCircular two) {
+    return (one.arco == two.arco && one.distance == two.distance);
+}
+bool operator== (const FiltroAngular one,const FiltroAngular two) {
+    return (one.rpose == two.rpose 
+        && one.motivo == two.motivo 
+        && one.tipo == two.tipo);
 }
