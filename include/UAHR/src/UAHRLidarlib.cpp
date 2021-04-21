@@ -116,18 +116,33 @@ void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf){
     
     // Si al hacerlos relativos pasan desde 180
     // a -180 hay que partirlos
+    
+    
+    /// TODO ESTO PUEDE DAR FALLO EN LOS CASOS DE 180 GRADOS
     if(f.rpose.arco.start > f.rpose.arco.end)                   
     {
+        
         if(f.rpose.arco.start != 180)
-            vdf.emplace_back(FiltroAngular(
-                Seccion(f.rpose.arco.start,180),
-                f.rpose.distance,
-                f.motivo,
-                f.tipo,
-                true
-                ));        
-        f.rpose.arco.start = -180;
-        f.salto = true;
+            if(f.rpose.arco.end != -180)
+            {    
+                vdf.emplace_back(FiltroAngular(
+                    Seccion(f.rpose.arco.start,180),
+                    f.rpose.distance,
+                    f.motivo,
+                    f.tipo,
+                    true
+                    ));     
+                f.rpose.arco.start = -180;
+                f.salto = true;
+
+            
+            }  
+
+            else
+                f.rpose.arco.end = 180;
+
+        else
+            f.rpose.arco.start = -180;
     }
 }
 

@@ -45,7 +45,7 @@ TEST(UAHRLidar, DangerAngles1)
 
   DangerAngles1C(robot,vr);
   EXPECT_EQ(vr[0],
-    FiltroAngular(Seccion(180,0)));
+    FiltroAngular(Seccion(-180,0)));
 
   robot.x = 100;
   robot.y = 700;
@@ -61,7 +61,7 @@ TEST(UAHRLidar, DangerAngles1)
   vr.clear();
   DangerAngles1C(robot,vr);
   EXPECT_EQ(vr[0],
-    FiltroAngular(Seccion(180,-90)));
+    FiltroAngular(Seccion(-180,-90)));
 
 
   robot.x = 1200;
@@ -106,8 +106,8 @@ TEST(UAHRLidar, UAHRLidar_DangerAngles2_Test)
   robot.y = 700;
   robot.theta = 0;
   vr.clear();
-  DangerAngles2C(robot,vr);
-  EXPECT_EQ(vr[0],FiltroAngular(Seccion(143,-30)));
+  DangerAngles2C(robot,vr);  
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(143,36)));
  
 
   robot.x = -1500;
