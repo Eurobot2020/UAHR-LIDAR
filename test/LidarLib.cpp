@@ -21,12 +21,8 @@ TEST(UAHRLidar, DangerAngles1)
 {
   pose robot;
   FiltroAngular arc_aux;
-  VFiltros v_safe;
   VFiltros vr;
   
-  float a;
-  int i=0;
-
   robot.x = 0;
   robot.y = 0;
   robot.theta = 0;
@@ -77,240 +73,153 @@ TEST(UAHRLidar, DangerAngles1)
   FiltroAngular(Seccion(156,-53)));
 }
 
-/*
+
 TEST(UAHRLidar, UAHRLidar_DangerAngles2_Test)
 {
   pose robot;
-  FiltroAngular arc_aux;
-  VFiltros v_safe;
-  VFiltros v_aux;
-  float a;
-  int i=0;
+  VFiltros vr;
 
   robot.x = 0;
   robot.y = 0;
   robot.theta = 0;
-  
-  arc_aux.rpose.arco.start = -180;
-  arc_aux.rpose.arco.end   = 180;
-  
-  v_safe.push_back(arc_aux);
-
-  EXPECT_EQ(DangerAngles2C(&robot)[0],
-          FiltroAngular(Seccion(-180,180),
-          ROBOT,0));
+  DangerAngles2C(robot,vr);
+  EXPECT_EQ(vr[0],
+  FiltroAngular(Seccion(-180,180)));
   
   robot.x = -100;
   robot.y = -100;
   robot.theta = 30;
-  EXPECT_EQ(DangerAngles2C(&robot)[0],
-          FiltroAngular(Seccion(-180,180),
-          ROBOT,0));
-  
+  vr.clear();
+  DangerAngles2C(robot,vr);
+  EXPECT_EQ(vr[0],
+  FiltroAngular(Seccion(-180,180)));
+    
   robot.x = -100;
   robot.y = 1000;
-  robot.theta = 30;
-  EXPECT_EQ(DangerAngles2C(&robot).size(),2);
-  EXPECT_EQ(DangerAngles2C(&robot)[0].rpose.arco.start,
-        -180);
-  EXPECT_EQ(DangerAngles2C(&robot)[0].rpose.arco.end,
-        -30);
-  EXPECT_EQ(DangerAngles2C(&robot)[0],
-          FiltroAngular(Seccion(-180,-30),
-          ROBOT,0));
-  EXPECT_EQ(DangerAngles2C(&robot)[1],
-          FiltroAngular(Seccion(150,180),
-          ROBOT,0));
+  vr.clear();
+  DangerAngles2C(robot,vr);
+  EXPECT_EQ(vr[0],
+  FiltroAngular(Seccion(-180,0)));
+  
 
   robot.x = -100;
   robot.y = 700;
   robot.theta = 0;
-
+  vr.clear();
+  DangerAngles2C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(143,-30)));
  
-  EXPECT_EQ(DangerAngles2C(&robot).size(),2);
-  
-  EXPECT_EQ(DangerAngles2C(&robot)[0],
-          FiltroAngular(Seccion(-180,36),
-          ROBOT,0));
-  EXPECT_EQ(DangerAngles2C(&robot)[1],
-         FiltroAngular(Seccion(143,180),
-          ROBOT,0));
 
-    robot.x = -1500;
-    robot.y = 1000;
-    robot.theta = 0;
+  robot.x = -1500;
+  robot.y = 1000;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles2C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-90,0)));
 
-    EXPECT_EQ(DangerAngles2C(&robot)[0],
-          FiltroAngular(Seccion(-90,0),
-          ROBOT,0));
-    
-    robot.x = -1500;
-    robot.y = 1000;
-    robot.theta = 180;
-    
-    EXPECT_EQ(DangerAngles2C(&robot)[0],
-            FiltroAngular(Seccion(90,180),
-            ROBOT,0));
-
-    robot.x = -1200;
-    robot.y = 800;
-    robot.theta = 0;
-
-    EXPECT_EQ(DangerAngles2C(&robot)[0],
-        FiltroAngular(Seccion(-126,23),
-        ROBOT,0));
-
+  robot.x = -1200;
+  robot.y = 800;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles2C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-126,23)));
 }
 
 TEST(UAHRLidar, UAHRLidar_DangerAngles3_Test)
 {
-    pose robot;
-    FiltroAngular arc_aux;
-    VFiltros v_safe;
-    VFiltros v_aux;
-    float a;
-    int i=0;
+  pose robot;
+  VFiltros vr;
 
-    robot.x = 0;
-    robot.y = 0;
-    robot.theta = 0;
-    
-    v_safe.push_back(arc_aux);
+  robot.x = 0;
+  robot.y = 0;
+  robot.theta = 0;
+  DangerAngles3C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-180,180)));
+  
+  robot.x = -100;
+  robot.y = -100;
+  vr.clear();
+  DangerAngles3C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-180,180)));
+  
+  robot.x = -100;
+  robot.y = -1000;
+  vr.clear();
+  DangerAngles3C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(0,180)));
+  
+  robot.x = -100;
+  robot.y = -700;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles3C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-36,-143)));
+ 
+  robot.x = -1500;
+  robot.y = -1000;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles3C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(0,90)));
 
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-            FiltroAngular(Seccion(-180,180),
-            ROBOT,0));
-    
-    robot.x = -100;
-    robot.y = -100;
-    robot.theta = 30;
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-          FiltroAngular(Seccion(-180,180),
-          ROBOT,0));
-    
-    robot.x = -100;
-    robot.y = -1000;
-    robot.theta = 30;
-    EXPECT_EQ(DangerAngles3C(&robot).size(),1);
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-            FiltroAngular(Seccion(-30,150),
-            ROBOT,0));
-
-    robot.x = -100;
-    robot.y = -700;
-    robot.theta = 0;
-
-    
-    EXPECT_EQ(DangerAngles3C(&robot).size(),2);
-    
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-            FiltroAngular(Seccion(-180,-143),
-            ROBOT,0));
-    EXPECT_EQ(DangerAngles3C(&robot)[1],
-            FiltroAngular(Seccion(-36,180),
-            ROBOT,0));
-
-    robot.x = -1500;
-    robot.y = -1000;
-    robot.theta = 0;
-
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-          FiltroAngular(Seccion(0,90),
-          ROBOT,0));
-    
-    robot.x = -1500;
-    robot.y = -1000;
-    robot.theta = 180;
-    
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-            FiltroAngular(Seccion(-180,-90),
-            ROBOT,0));
-
-    robot.x = -1200;
-    robot.y = -800;
-    robot.theta = 0;
-    EXPECT_EQ(DangerAngles3C(&robot)[0],
-        FiltroAngular(Seccion(-23,126),
-        ROBOT,0));
+  robot.x = -1200;
+  robot.y = -800;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles3C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-23,126)));
 }
 
 
 TEST(UAHRLidar, UAHRLidar_DangerAngles4_Test)
 {
-    pose robot;
-    FiltroAngular arc_aux;
-    VFiltros v_safe;
-    VFiltros v_aux;
-    float a;
-    int i=0;
+  pose robot;
+  VFiltros vr;
 
-    robot.x = 0;
-    robot.y = 0;
-    robot.theta = 0;
-    
-    arc_aux.rpose.arco.start = -180;
-    arc_aux.rpose.arco.end   = 180;
+  robot.x = 0;
+  robot.y = 0;
+  robot.theta = 0;
+  DangerAngles4C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-180,180)));
 
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-            FiltroAngular(Seccion(-180,180),
-            ROBOT,0));
-    
-    robot.x = 100;
-    robot.y = -100;
-    robot.theta = 30;
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-            FiltroAngular(Seccion(-180,180),
-            ROBOT,0));
-    
-    robot.x = 100;
-    robot.y = -1000;
-    robot.theta = 30;
-    EXPECT_EQ(DangerAngles4C(&robot).size(),1);
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-            FiltroAngular(Seccion(-30,150),
-            ROBOT,0));
-    robot.x = 100;
-    robot.y = -700;
-    robot.theta = 0;
+  robot.x = 100;
+  robot.y = -100;
+  robot.theta = 30;
+  vr.clear();
+  DangerAngles4C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-180,180)));
 
-    
-    EXPECT_EQ(DangerAngles4C(&robot).size(),2);
-    
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-        FiltroAngular(Seccion(-180,-143),
-        ROBOT,0));
-    EXPECT_EQ(DangerAngles4C(&robot)[1],
-        FiltroAngular(Seccion(-36,180),
-        ROBOT,0));
+  robot.x = 100;
+  robot.y = -1000;
+  robot.theta = 30;
+  vr.clear();
+  DangerAngles4C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(0,180)));
 
-    robot.x = 1500;
-    robot.y = -1000;
-    robot.theta = 0;
+  robot.x = 100;
+  robot.y = -700;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles4C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-36,-143)));
 
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-        FiltroAngular(Seccion(90,180),
-        ROBOT,0));
-    
-    robot.x = 1500;
-    robot.y = -1000;
-    robot.theta = 180;
-    
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-            FiltroAngular(Seccion(-90,0),
-            ROBOT,0));
+  robot.x = 1500;
+  robot.y = -1000;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles4C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(90,180)));
 
-    robot.x = 1200;
-    robot.y = -800;
-    robot.theta = 0;
 
-    EXPECT_EQ(DangerAngles4C(&robot)[0],
-        FiltroAngular(Seccion(-180,-156),
-        ROBOT,0));
-    EXPECT_EQ(DangerAngles4C(&robot)[1],
-        FiltroAngular(Seccion(53,180),
-        ROBOT,0));
+  robot.x = 1200;
+  robot.y = -800;
+  robot.theta = 0;
+  vr.clear();
+  DangerAngles4C(robot,vr);
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(53,-156)));
 }
 
+/*
 TEST(UAHRLidar, UAHRObjectsAngles)
 {
     pose robot;
