@@ -68,10 +68,7 @@ Visualization Manager:
       Marker Topic: triangulate_objects
       Name: Objetos
       Namespaces:
-        Baliza_abajo: true
-        Baliza_arriba: true
-        Baliza_intermedia: true
-        Torre: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -79,16 +76,7 @@ Visualization Manager:
       Marker Topic: enemy_markers
       Name: Enemigos
       Namespaces:
-        LE0: true
-        LE1: true
-        LE2: true
-        LE3: true
-        LE4: true
-        LE5: true
-        LE6: true
-        LE7: true
-        LE8: true
-        LE9: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -96,7 +84,26 @@ Visualization Manager:
       Marker Topic: rviz_robot_filters
       Name: Filters
       Namespaces:
-        {}
+        0_chiquito: true
+        0_grande: true
+        1_chiquito: true
+        1_grande: true
+        2_chiquito: true
+        2_grande: true
+        3_chiquito: true
+        3_grande: true
+        4_chiquito: true
+        4_grande: true
+        5_chiquito: true
+        5_grande: true
+        6_chiquito: true
+        6_grande: true
+        7_chiquito: true
+        7_grande: true
+        8_chiquito: true
+        8_grande: true
+        9_chiquito: true
+        9_grande: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -126,7 +133,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 30.56999969482422
+      Distance: 47.271514892578125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -134,17 +141,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 3.536952257156372
-        Y: 6.825789928436279
-        Z: 12.917723655700684
+        X: 11.1864652633667
+        Y: 13.975564002990723
+        Z: 16.629695892333984
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6802074909210205
+      Pitch: 1.5297963619232178
       Target Frame: <Fixed Frame>
-      Yaw: 2.5881121158599854
+      Yaw: 3.12129807472229
     Saved:
       - Class: rviz/Orbit
         Distance: 30

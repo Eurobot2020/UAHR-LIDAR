@@ -12,6 +12,18 @@ from std_msgs.msg import String
 from Fast_rviz import new_cube,new_line,size,new_circunferance
 from uah_msgs.msg import PolarArray, array_arcos,Pose2DArray
 
+def cb_pose(msg):
+    print("aksfjadsf")
+    robot_marker.pose.position.x = msg.x/SF
+    robot_marker.pose.position.y = msg.y/SF
+    # Va en cuaternios
+    angulo = math.radians(msg.theta)
+    robot_marker.pose.orientation.z = math.sin(angulo/2)
+    robot_marker.pose.orientation.w = math.cos(angulo/2)
+    pose.x = msg.x
+    pose.y = msg.y
+    pose.theta = msg.theta
+    pub_robot_marker_pose.publish(robot_marker)    
 
 
 # LINEAS VERDES:
@@ -57,7 +69,6 @@ def cb_enemy_robots(msg):
 #
 def cb_arcos(msg):
     arcos = []
-    print("ARCOS")
     for i, arco in enumerate(msg.arcos):
         if(arco.motivo == 'R'):
             color = 'r'
@@ -96,13 +107,16 @@ if __name__ == "__main__":
             PolarArray, callback = cb_recognized_objects)
     sub_enemy_robots       = rospy.Subscriber("lidar_robots", 
             PolarArray, callback = cb_enemy_robots)
+    
+    sub_robot_marker_pose = rospy.Subscriber("pose", Pose2D, callback=cb_pose)
+
 
     pub_robot_marker_pose  = rospy.Publisher("pose_marker", Marker, queue_size = 10)
     pub_recognized_objects = rospy.Publisher("triangulate_objects",MarkerArray, queue_size = 10)
     pub_recognized_robots  = rospy.Publisher("enemy_markers",MarkerArray, queue_size = 10)
     pub_arcos = rospy.Publisher(
         "rviz_robot_filters", MarkerArray, queue_size=10)
-    pub_pose  = rospy.Publisher("pose",Pose2D, queue_size = 10)
+    #pub_pose  = rospy.Publisher("pose",Pose2D, queue_size = 10)
 
 
     SF = 100 # Factor de escalado     
