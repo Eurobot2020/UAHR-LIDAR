@@ -275,7 +275,6 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
     float fy = 0;
 
 
-    // TODO PUEDE HABER UN ERROR DE CÁLCULO CALCULATING
     // Calculo los angulos que hay que filtrar:
     if((LIMX - pr.x) < DISTANCIA_SEGURIDAD) 
     {
