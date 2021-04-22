@@ -168,7 +168,12 @@ void DangerAngles1C(const pose &pr, VFiltros &vdf)
     if((LIMY - pr.y)< DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(180-fy,fy));
+        if (fy !=0)
+            vdf.emplace_back(Seccion(180-fy,fy));            
+        else
+            vdf.emplace_back(Seccion(-180,0));
+
+
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
@@ -178,7 +183,7 @@ void DangerAngles1C(const pose &pr, VFiltros &vdf)
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
-    else if((vdf.size()==2) && (vdf[1].rpose.arco.start > vdf[0].rpose.arco.end))
+    else if((vdf.size()==2) && (vdf[0].rpose.arco.start > vdf[1].rpose.arco.end))
     {
         vdf[0].rpose.arco.start = vdf[1].rpose.arco.start;
         vdf.pop_back();
@@ -206,7 +211,10 @@ void DangerAngles2C(const pose &pr, VFiltros &vdf)
     if((LIMY - pr.y) < DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(180-fy,fy));
+        if (fy !=0)
+            vdf.emplace_back(Seccion(180-fy,fy));            
+        else
+            vdf.emplace_back(Seccion(-180,0));
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
@@ -216,6 +224,8 @@ void DangerAngles2C(const pose &pr, VFiltros &vdf)
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
+    // TODO SITUACIÓN EXCEPCIONAL ENTRELAZAMIENTO
+    // SI ESTA ARRIBA DEL TODO 
     else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
     {
         vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;
@@ -248,6 +258,10 @@ void DangerAngles3C(const pose &pr, VFiltros &vdf)
     {
         fy  = RAD2DEG(asin((-LIMY - pr.y)/DISTANCIA_SEGURIDAD));
         vdf.emplace_back(Seccion(fy,-180 - fy));        
+        if (fy !=0)
+            vdf.emplace_back(Seccion(fy,-180 - fy));            
+        else
+            vdf.emplace_back(Seccion(0,180));
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
@@ -287,13 +301,14 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
         vdf.emplace_back(Seccion(fy,-180 - fy));        
     }
 
-
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
         vdf.emplace_back(Seccion(-180,180));
         return;
     }
+    // TODO: Caso excepcional si estamos pegados abajo
+    
     else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
     {
         vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;

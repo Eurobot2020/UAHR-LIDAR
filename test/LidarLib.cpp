@@ -17,7 +17,7 @@ TEST(UAHRLidar, M180)
   EXPECT_EQ(M180(-270),90);
 }
 
-TEST(UAHRLidar, DangerAngles1)
+TEST(UAHRLidar, DangerAngles1_Test)
 {
   pose robot;
   FiltroAngular arc_aux;
@@ -74,7 +74,7 @@ TEST(UAHRLidar, DangerAngles1)
 }
 
 
-TEST(UAHRLidar, UAHRLidar_DangerAngles2_Test)
+TEST(UAHRLidar, DangerAngles2_Test)
 {
   pose robot;
   VFiltros vr;
@@ -111,11 +111,11 @@ TEST(UAHRLidar, UAHRLidar_DangerAngles2_Test)
  
 
   robot.x = -1500;
-  robot.y = 1000;
+  robot.y = 900;
   robot.theta = 0;
   vr.clear();
   DangerAngles2C(robot,vr);
-  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-90,0)));
+  EXPECT_EQ(vr[0],FiltroAngular(Seccion(-90,11.7)));
 
   robot.x = -1500;
   robot.y = 0;
