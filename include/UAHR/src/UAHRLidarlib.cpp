@@ -312,7 +312,7 @@ void DesacoploAngulos(VFiltros &Vf)
             if(Vf[i].rpose.arco.end<Vf[i+1].rpose.arco.end)
             {
                 // Si ambos empiezan en el mismo ángulo:
-                if(Vf[i].rpose.arco.start == Vf[i+1].rpose.arco.end)
+                if(Vf[i].rpose.arco.start == Vf[i+1].rpose.arco.start)
                 {
                     Vf[i+1].rpose.arco.start = Vf[i].rpose.arco.end;
                     Vf[i].rpose.distance = Vf[i].rpose.distance + Vf[i+1].rpose.distance;
@@ -324,7 +324,7 @@ void DesacoploAngulos(VFiltros &Vf)
                 else
                 {
                     // Creo el Arco de intersección:
-                    VF.emplace_back(
+                    Vf.emplace_back(
                         Seccion(Vf[i+1].rpose.arco.start,Vf[i].rpose.arco.end),
                         Vf[i].rpose.distance + Vf[i+1].rpose.distance,
                         AMBOS,
@@ -346,7 +346,7 @@ void DesacoploAngulos(VFiltros &Vf)
             else if(Vf[i].rpose.arco.end>Vf[i+1].rpose.arco.end)
             {
                 // Creamos el arco del final
-                VF.emplace_back(
+                Vf.emplace_back(
                     Seccion(Vf[i+1].rpose.arco.end, Vf[i].rpose.arco.end),
                     Vf[i].rpose.distance,
                     Vf[i].motivo,
@@ -378,7 +378,7 @@ void DesacoploAngulos(VFiltros &Vf)
                 if(Vf[i].rpose.arco.start == Vf[i].rpose.arco.end)
                     Vf.erase(Vf.begin()+i);
             }
-            std::sort(VObjRdistance.begin()+i,VObjRdistance.end(),Compare_FiltroAngular);    
+            std::sort(Vf.begin()+i,Vf.end(),Compare_FiltroAngular);    
         }
         else i++;        
     }
