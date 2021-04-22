@@ -14,8 +14,6 @@
 
 
 
-
-
 bool Compare_FiltroAngular(FiltroAngular a1, FiltroAngular a2) {
    if(a1.rpose.arco.start < a2.rpose.arco.start) {
       return true;
@@ -49,8 +47,6 @@ float M180(float angle)
        a = a+360;
     return a;
 }
-
-
 
 
 void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &vf)
@@ -135,7 +131,6 @@ void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf){
                 f.rpose.arco.start = -180;
                 f.salto = true;
 
-            
             }  
 
             else
@@ -168,12 +163,7 @@ void DangerAngles1C(const pose &pr, VFiltros &vdf)
     if((LIMY - pr.y)< DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        if (fy !=0)
-            vdf.emplace_back(Seccion(180-fy,fy));            
-        else
-            vdf.emplace_back(Seccion(-180,0));
-
-
+        vdf.emplace_back(Seccion(180-fy,fy));            
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
@@ -211,10 +201,7 @@ void DangerAngles2C(const pose &pr, VFiltros &vdf)
     if((LIMY - pr.y) < DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        if (fy !=0)
-            vdf.emplace_back(Seccion(180-fy,fy));            
-        else
-            vdf.emplace_back(Seccion(-180,0));
+        vdf.emplace_back(Seccion(180-fy,fy));            
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
@@ -224,8 +211,6 @@ void DangerAngles2C(const pose &pr, VFiltros &vdf)
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
-    // TODO SITUACIÓN EXCEPCIONAL ENTRELAZAMIENTO
-    // SI ESTA ARRIBA DEL TODO 
     else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
     {
         vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;
@@ -258,10 +243,6 @@ void DangerAngles3C(const pose &pr, VFiltros &vdf)
     {
         fy  = RAD2DEG(asin((-LIMY - pr.y)/DISTANCIA_SEGURIDAD));
         vdf.emplace_back(Seccion(fy,-180 - fy));        
-        if (fy !=0)
-            vdf.emplace_back(Seccion(fy,-180 - fy));            
-        else
-            vdf.emplace_back(Seccion(0,180));
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
@@ -307,8 +288,7 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
         vdf.emplace_back(Seccion(-180,180));
         return;
     }
-    // TODO: Caso excepcional si estamos pegados abajo
-    
+    // Caso especial no hay ángulos seguros en esta posición:
     else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
     {
         vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;
@@ -318,106 +298,100 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
 }
 
 
-
-
-void DesacoploAngulos(VFiltros &VObjRdistance)
+void DesacoploAngulos(VFiltros &Vf)
 {   
-    int i;
-    int j;
+    int i = 0;
     float aux_angle;
-    FiltroAngular aux;
-    
-    i = 0;
-    j = VObjRdistance.size();
-    
-    // Analizamos si hay angulos que se pisan:
-    while(i<VObjRdistance.size()-1)
+    // Cambiar por punteros?
+    while(i<Vf.size()-1)
     {
         // Existe acoplamiento entre dos angulos de interes?
-        if(VObjRdistance[i+1].rpose.arco.start<VObjRdistance[i].rpose.arco.end)
+        if(Vf[i+1].rpose.arco.start<Vf[i].rpose.arco.end)
         {
-            if(VObjRdistance[i].rpose.arco.end<VObjRdistance[i+1].rpose.arco.end)
+            // El primer filtro solo contiene parte del segundo filtro
+            if(Vf[i].rpose.arco.end<Vf[i+1].rpose.arco.end)
             {
-                // Es necesario añadir condición de inicio de igual igual?
-                // Arco de intersección:
-                aux.rpose.arco.start  = VObjRdistance[i+1].rpose.arco.start;
-                aux.rpose.arco.end    = VObjRdistance[i].rpose.arco.end;
+                // Si ambos empiezan en el mismo ángulo:
+                if(Vf[i].rpose.arco.start == Vf[i+1].rpose.arco.end)
+                {
+                    Vf[i+1].rpose.arco.start = Vf[i].rpose.arco.end;
+                    Vf[i].rpose.distance = Vf[i].rpose.distance + Vf[i+1].rpose.distance;
+                    Vf[i].motivo = AMBOS;
+                    Vf[i].tipo   = Vf[i].tipo + Vf[i+1].tipo;
+                    Vf[i].salto  = Vf[i].salto + Vf[i+1].salto;
+                }
+
+                else
+                {
+                    // Creo el Arco de intersección:
+                    VF.emplace_back(
+                        Seccion(Vf[i+1].rpose.arco.start,Vf[i].rpose.arco.end),
+                        Vf[i].rpose.distance + Vf[i+1].rpose.distance,
+                        AMBOS,
+                        Vf[i].tipo + Vf[i+1].tipo,
+                        Vf[i].salto + Vf[i+1].salto);
                 
-                aux.rpose.distance    = VObjRdistance[i].rpose.distance + VObjRdistance[i+1].rpose.distance;
-                aux.motivo            = AMBOS;
-                aux.tipo              = VObjRdistance[i].tipo + VObjRdistance[i+1].tipo;
-                aux.salto             = VObjRdistance[i].salto + VObjRdistance[i+1].salto;
+                    // Almaceno un ángulo para no borrarlo
+                    aux_angle = Vf[i].rpose.arco.end;
 
-                aux_angle = VObjRdistance[i].rpose.arco.end;
+                    // Modificamos el primer ángulo:
+                    Vf[i].rpose.arco.end = Vf[i+1].rpose.arco.start;
 
-                // Modificamos el primer ángulo:
-                VObjRdistance[i].rpose.arco.end = VObjRdistance[i+1].rpose.arco.start;
-
-                // Modificamos el segundo arco
-                VObjRdistance[i+1].rpose.arco.start = aux_angle;
-
-                // Insertamos el arco de conflicto
-                VObjRdistance.insert(VObjRdistance.begin()+i+1,aux);
-                
-                // Esta operación se puede quitar
-                // Si son iguales, este arco sobra:
-                if(VObjRdistance[i].rpose.arco.start == VObjRdistance[i].rpose.arco.end)
-                    VObjRdistance.erase(VObjRdistance.begin()+i);
+                    // Modificamos el segundo arco
+                    Vf[i+1].rpose.arco.start = aux_angle;
+                }
             }
-            else if(VObjRdistance[i].rpose.arco.end>VObjRdistance[i+1].rpose.arco.end)
+
+            // El segundo filtro esta completamente contenido en el primero
+            else if(Vf[i].rpose.arco.end>Vf[i+1].rpose.arco.end)
             {
+                // Creamos el arco del final
+                VF.emplace_back(
+                    Seccion(Vf[i+1].rpose.arco.end, Vf[i].rpose.arco.end),
+                    Vf[i].rpose.distance,
+                    Vf[i].motivo,
+                    Vf[i].tipo,
+                    Vf[i].salto);
                 
-                aux = VObjRdistance[i];
-                aux.rpose.arco.start = VObjRdistance[i+1].rpose.arco.end;
-
-                VObjRdistance[i].rpose.arco.end = VObjRdistance[i+1].rpose.arco.start;
-                VObjRdistance[i+1].tipo = VObjRdistance[i+1].tipo + VObjRdistance[i].tipo;
-                VObjRdistance[i+1].motivo = AMBOS;
-                VObjRdistance[i+1].rpose.distance = VObjRdistance[i+1].rpose.distance + VObjRdistance[i].rpose.distance;
-                VObjRdistance[i+1].salto = VObjRdistance[i+1].salto + VObjRdistance[i].salto;
-
-
-
-                // Insertamos el arco de conflicto
-                VObjRdistance.insert(VObjRdistance.begin()+i+2,aux);
-                // Un arco de más
-                if(VObjRdistance[i].rpose.arco.start == VObjRdistance[i].rpose.arco.end)
-                    VObjRdistance.erase(VObjRdistance.begin()+i);
+                // Modificamos el arco del principio 
+                Vf[i].rpose.arco.end   = Vf[i+1].rpose.arco.start;
+                
+                // Modificamos el arco intermedio
+                Vf[i+1].tipo           = Vf[i+1].tipo + Vf[i].tipo;
+                Vf[i+1].motivo         = AMBOS;
+                Vf[i+1].rpose.distance = Vf[i+1].rpose.distance + Vf[i].rpose.distance;
+                Vf[i+1].salto          = Vf[i+1].salto + Vf[i].salto;
             }
 
             else
             {
-
                 // Modificamos el ángulo del arco
-                VObjRdistance[i].rpose.arco.end  = VObjRdistance[i+1].rpose.arco.start;
+                Vf[i].rpose.arco.end  = Vf[i+1].rpose.arco.start;
                 
                 // Arco de intersección:
-                VObjRdistance[i+1].rpose.distance    = VObjRdistance[i].rpose.distance + VObjRdistance[i+1].rpose.distance;
-                VObjRdistance[i+1].motivo            = AMBOS;
-                VObjRdistance[i+1].tipo              = VObjRdistance[i].tipo + VObjRdistance[i+1].tipo;
-                VObjRdistance[i+1].salto             = VObjRdistance[i].salto + VObjRdistance[i+1].salto;
+                Vf[i+1].rpose.distance    = Vf[i].rpose.distance + Vf[i+1].rpose.distance;
+                Vf[i+1].motivo            = AMBOS;
+                Vf[i+1].tipo              = Vf[i].tipo  + Vf[i+1].tipo;
+                Vf[i+1].salto             = Vf[i].salto + Vf[i+1].salto;
                 
                 // Un arco de más
-                if(VObjRdistance[i].rpose.arco.start == VObjRdistance[i].rpose.arco.end)
-                    VObjRdistance.erase(VObjRdistance.begin()+i);
+                if(Vf[i].rpose.arco.start == Vf[i].rpose.arco.end)
+                    Vf.erase(Vf.begin()+i);
             }
+            std::sort(VObjRdistance.begin()+i,VObjRdistance.end(),Compare_FiltroAngular);    
         }
-        //std::sort(VObjRdistance.begin(), 
-        //VObjRdistance.end(), 
-        //Compare_FiltroAngular);
-
-        i++;        
+        else i++;        
     }
 }
 
 
 VFiltros new_filters(pose const &robot,VObjetos &lfobjects ){
-
-    // Creo  variables auxiliares.
-    FiltroAngular aux;
-    CoronaCircular dist;
+    // TODO Pasar por referencia
+    // TODO Mirar Cache para optimizar el acceso
     VFiltros VObjRdistance;
-    
+    VObjRdistance.reserve(20);
+
+
     // Calculo los angulos que estan fuera del campo
     if((robot.x>=0)&&(robot.y>=0))
         DangerAngles1C(robot,VObjRdistance);
@@ -443,6 +417,9 @@ VFiltros new_filters(pose const &robot,VObjetos &lfobjects ){
     // Ordenamos los angulos para que analizarlo 
     // de manera ordenada desde el lidar:
     std::sort(VObjRdistance.begin(),VObjRdistance.end(),Compare_FiltroAngular);    
+    
+    // Comprobamos que no haya filtrs que
+    // comen a otros filtros
     DesacoploAngulos(VObjRdistance);
         
     return VObjRdistance;

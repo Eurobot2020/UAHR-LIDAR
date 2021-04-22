@@ -99,12 +99,9 @@ struct FiltroAngular
     // Operadores
     friend bool operator== (const FiltroAngular one,const FiltroAngular two);
 };
+
 using VFiltros = std::vector<FiltroAngular>;
-
-
-
 using VObjetos = std::vector<ObjSearchData>;
-using VFiltros = std::vector<FiltroAngular>;
 
 /*
 class LidarHandler
