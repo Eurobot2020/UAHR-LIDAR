@@ -1,18 +1,16 @@
-
-
+// 
 #pragma once
+#include <vector.h>
+#include "uahr_msgs/PolarArray.h"
+using VPolars = uahr_msgs::PolarArray;
+using VVPolars = vector<uahr_msgs::PolarArray>;
 
-
-// Defines utiles
+// Defines:
 #define OBJETO  'O'
 #define ROBOT   'R'
 #define AMBOS   'A'
 #define FA       3
-#define CONSTFA  5
-#define FD       0.1        
-#define N_OBJETOS  6    
-#define MAX_DISANCE_ENEMY 3100
-
+#define FD       0.1  
 // Estructuras
 struct pose
 {
@@ -102,47 +100,3 @@ struct FiltroAngular
 
 using VFiltros = std::vector<FiltroAngular>;
 using VObjetos = std::vector<ObjSearchData>;
-
-/*
-class LidarHandler
-{
-    private:
-        const std::vector<ObjSearchData> TriangulateObjects;
-        VFiltros SearchSections;
-        pose robot;
-
-    public:
-        LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p);
-        ~LidarHandler();
-        
-};
-
-LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p)
-: TriangulateObjects{ObjetosBusqueda}, robot{p}
-{
-    this->
-    this->ArcOfInterest  
-
-}
-
-
-UAHR::~UAHR()
-{}
-*/
-
-
-float M180(float angle);
-bool Compare_FiltroAngular(FiltroAngular a1, FiltroAngular a2);
-struct CoronaCircular near_objects_pose(const struct pose *r_pose,const struct ObjSearchData *p_obj);
-void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &vf);
-void DangerAngles1C(const pose &pr, VFiltros &vdf);
-void DangerAngles2C(const pose &pr, VFiltros &vdf);
-void DangerAngles3C(const pose &pr, VFiltros &vdf);
-void DangerAngles4C(const pose &pr, VFiltros &vdf);
-
-void DesacoploAngulos(VFiltros &VObjRdistance);
-VFiltros new_filters(pose const &robot,VObjetos &lfobjects);
-
-
-extern std::vector<ObjSearchData> lfobjects;
-extern int fil_angular [4];

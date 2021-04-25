@@ -19,7 +19,7 @@
 #include "uahr_msgs/array_arcos.h"
 
 #include <math.h>
-#include "UAHRLidarlib.hpp"
+#include "uahr_class.hpp"
 
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
@@ -40,58 +40,12 @@ RPlidarDriver * drv = NULL;
 
 
 std::vector<FiltroAngular> VObjRdistance;
-std::vector<ObjSearchData> lfobjects;
 
 //  int fil_angular[4] {FA+10,FA+10,FA/2,FA};
 //  int fil_angular[4] {FA,FA,FA,FA};
 
 ros::Publisher  pub_arcos;
 
-void cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
-{
-    /*
-        Esta función calcula una serie de ángulos en 
-        los que no es posibe que haya riesgo de 
-        colisión con el robot enemigo.
-    */
-
-    // Almaceno la posición del robot
-    struct pose robot(msg->x,msg->y,msg->theta);    
-    VObjRdistance = new_filters(robot,lfobjects);
-}
-void cb_pose_promt(const geometry_msgs::Pose2D::ConstPtr& msg)
-{
-    /*
-        Esta función calcula una serie de ángulos en 
-        los que no es posibe que haya riesgo de 
-        colisión con el robot enemigo.
-    */
-
-    // Almaceno la posición del robot
-    
-    struct pose robot;
-    uahr_msgs::Arco_Interes arc_aux; 
-    uahr_msgs::array_arcos aarray;
-    robot.x = msg->x;
-    robot.y = msg->y;
-    robot.theta = M180(msg->theta);
-    
-    VObjRdistance = new_filters(robot,lfobjects);
-        
-    
-    
-    for(int i=0; i<VObjRdistance.size(); i++)
-    {
-        arc_aux.distance_inf = VObjRdistance[i].rpose.distance.start;
-        arc_aux.distance_sup = VObjRdistance[i].rpose.distance.end;
-        arc_aux.angle_inf    = VObjRdistance[i].rpose.arco.start;
-        arc_aux.angle_sup    = VObjRdistance[i].rpose.arco.end;
-        arc_aux.motivo       = VObjRdistance[i].motivo;
-        aarray.arcos.push_back(arc_aux);
-    }
-
-    pub_arcos.publish(aarray);
-}
 
 
 void publish_scan(ros::Publisher *pub_robots,
@@ -384,6 +338,7 @@ int main(int argc, char * argv[])
     std::string name_objs;
     int fil_angular[4] {FA+10,FA+10,FA/2,FA};
     ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");
+    std::vector<ObjSearchData> lfobjects;
 
     std::string modo;
     std::vector<int> ejemplos_list;
@@ -393,6 +348,7 @@ int main(int argc, char * argv[])
 
     ros::Subscriber sub_pose;
     
+
     // Parametros euroboteros
     if( nh.searchParam("pose_x",name_x) 
         &&
@@ -432,14 +388,15 @@ int main(int argc, char * argv[])
         
         if(modo=="demo")
         {
-            sub_pose   = nh.subscribe("pose", 1000, cb_pose_promt);
+            class LidarHandler Handler(lfobjects,robot);
+            sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
             pub_arcos  = nh.advertise<uahr_msgs::array_arcos>("arcos", 1000);
             ROS_INFO("Configure demo");
         }
         else
         {
-            ROS_INFO("FF");
-            sub_pose   = nh.subscribe("pose", 1000, cb_pose);
+            class LidarHandler Handler(lfobjects,robot);
+            sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
         }
         
         //n.getParam(, i);
