@@ -176,7 +176,7 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
     // Intento construir el elemento directamente,
     // en el heap
     vf.emplace_back(OBJETO,pasive_obj.id);     
-    FiltroAngular f = vf.back();
+    FiltroAngular    &f = vf.back();
 
     // Calculo la distancia desde el observador
     // hasta las distintas partes del objeto:
@@ -195,8 +195,7 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
     // la corona dependiendo de un factor de 
     // seguridad:        
     if(adiff>0)
-    {
-
+    {   
         f.rpose.arco.start = M180(aoi - FA/adiff * pasive_obj.aexp);
         f.rpose.arco.end   = M180(aos + FA/adiff * pasive_obj.aexp);
     }
@@ -206,13 +205,14 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
         f.rpose.arco.end   = M180(aoi - FA/adiff * pasive_obj.aexp);
     }
     
+
     // Calculo la distancia hasta el objeto.
     di = sqrt(dxi*dxi+dyi*dyi);
     ds = sqrt(dxs*dxs+dys*dys);
     f.rpose.distance.start = (1 - pasive_obj.dexp) * (di+ds)/2;
     f.rpose.distance.end   = (1 + pasive_obj.dexp) * (di+ds)/2;
     f.motivo = OBJETO;
-    f.tipo = pasive_obj.id;
+    f.tipo   = pasive_obj.id;
 }
 
 void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf){
@@ -338,7 +338,7 @@ void DesacoploAngulos(VFiltros &Vf)
 }
 
 
-void new_filters(VFiltros &VObjRdistance,pose const &robot,VObjetos &lfobjects ){
+void new_filters(VFiltros &VObjRdistance,pose const &robot,const VObjetos &lfobjects ){
 
     // Calculo los angulos que estan fuera del campo
     if((robot.x>=0)&&(robot.y>=0))
