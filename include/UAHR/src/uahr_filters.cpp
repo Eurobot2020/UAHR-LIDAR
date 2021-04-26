@@ -215,37 +215,38 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
     f.tipo   = pasive_obj.id;
 }
 
-void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf){
-    f.rpose.arco.start = M180(f.rpose.arco.start - pr.theta);
-    f.rpose.arco.end   = M180(f.rpose.arco.end   - pr.theta);
-    
-    // Si al hacerlos relativos pasan desde 180
-    // a -180 hay que partirlos
-    
-    
-    /// TODO ESTO PUEDE DAR FALLO EN LOS CASOS DE 180 GRADOS
-    if(f.rpose.arco.start > f.rpose.arco.end)                   
-    {
-        
-        if(f.rpose.arco.start != 180)
-            if(f.rpose.arco.end != -180)
-            {    
-                vdf.emplace_back(FiltroAngular(
-                    Seccion(f.rpose.arco.start,180),
-                    f.rpose.distance,
-                    f.motivo,
-                    f.tipo,
-                    true
-                    ));     
-                f.rpose.arco.start = -180;
-                f.salto = true;
-            }  
+void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf)
+{
+    if(!((f.rpose.arco.start == -180) && (f.rpose.arco.end == 180)))
+    {    
+        f.rpose.arco.start = M180(f.rpose.arco.start - pr.theta);
+        f.rpose.arco.end   = M180(f.rpose.arco.end   - pr.theta);
+
+        // Si al hacerlos relativos pasan desde 180
+        // a -180 hay que partirlos
+        if(f.rpose.arco.start > f.rpose.arco.end)                   
+        {
+
+            if(f.rpose.arco.start != 180)
+                if(f.rpose.arco.end != -180)
+                {    
+                    vdf.emplace_back(FiltroAngular(
+                        Seccion(f.rpose.arco.start,180),
+                        f.rpose.distance,
+                        f.motivo,
+                        f.tipo,
+                        true
+                        ));     
+                    f.rpose.arco.start = -180;
+                    f.salto = true;
+                }  
+
+                else
+                    f.rpose.arco.end = 180;
 
             else
-                f.rpose.arco.end = 180;
-
-        else
-            f.rpose.arco.start = -180;
+                f.rpose.arco.start = -180;
+        }
     }
 }
 

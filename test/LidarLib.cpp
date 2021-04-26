@@ -274,7 +274,62 @@ TEST(UAHRLidar, UAHRObjectsAngles)
     EXPECT_EQ((int)vf[0].rpose.arco.start,21);
     EXPECT_EQ((int)vf[0].rpose.arco.end,(int)29);
 }
+TEST(UAHRLidar,RelativeAngle)
+{
+  FiltroAngular f;
+  pose pr(0,0,45);
+  VFiltros vdf;
+  
+  f.rpose.arco.start = 10;
+  f.rpose.arco.end  = 30;
+  vdf.push_back(f);
+  
+  RelativeAngle(vdf[0] ,pr,vdf);
+  EXPECT_EQ((int)vdf.size(),1);
 
+  EXPECT_EQ((int)vdf[0].rpose.arco.start,-35);
+  EXPECT_EQ((int)vdf[0].rpose.arco.end,-15);
+  f.rpose.arco.start = 90;
+  f.rpose.arco.end  = 0;
+  vdf.push_back(f);
+  f.rpose.arco.start = -170;
+  f.rpose.arco.end  = -120;
+  vdf.push_back(f);
+  RelativeAngle(vdf[2] ,pr,vdf);
+  EXPECT_EQ(vdf.size(),4);
+  EXPECT_EQ(vdf[2].rpose.arco.start,-180);
+  EXPECT_EQ(vdf[2].rpose.arco.end,-165);
+  EXPECT_EQ(vdf[3].rpose.arco.start,145);
+  EXPECT_EQ(vdf[3].rpose.arco.end,180);
+  
+  f.rpose.arco.start = -180+45;
+  f.rpose.arco.end   = -120 +45;
+  vdf.push_back(f);
+  RelativeAngle(vdf[4] ,pr,vdf);
+  EXPECT_EQ(vdf.size(),5);
+  EXPECT_EQ(vdf[4].rpose.arco.start,-180);
+  EXPECT_EQ(vdf[4].rpose.arco.end,-120);
+
+
+  f.rpose.arco.start = 120 - 45;
+  f.rpose.arco.end   = 180 - 45;
+  vdf.push_back(f);
+  RelativeAngle(vdf[5] ,pr,vdf);
+  EXPECT_EQ(vdf.size(),6);
+  EXPECT_EQ(vdf[5].rpose.arco.start,30);
+  EXPECT_EQ(vdf[5].rpose.arco.end,90);
+
+
+  f.rpose.arco.start = -180;
+  f.rpose.arco.end   = 180 ;
+  vdf.push_back(f);
+  RelativeAngle(vdf[6] ,pr,vdf);
+  EXPECT_EQ(vdf.size(),7);
+  EXPECT_EQ(vdf[6].rpose.arco.start,-180);
+  EXPECT_EQ(vdf[6].rpose.arco.end,180);
+
+
+}
 
 TEST(UAHRLidar, DesacoploAngulos)
 {
