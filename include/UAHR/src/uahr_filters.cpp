@@ -176,7 +176,7 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
     // Intento construir el elemento directamente,
     // en el heap
     vf.emplace_back(OBJETO,pasive_obj.id);     
-    FiltroAngular    &f = vf.back();
+    FiltroAngular &f = vf.back();
 
     // Calculo la distancia desde el observador
     // hasta las distintas partes del objeto:

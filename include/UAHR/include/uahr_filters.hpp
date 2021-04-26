@@ -11,4 +11,6 @@ void DangerAngles1C(const pose &pr, VFiltros &vdf);
 void DangerAngles2C(const pose &pr, VFiltros &vdf);
 void DangerAngles3C(const pose &pr, VFiltros &vdf);
 void DangerAngles4C(const pose &pr, VFiltros &vdf);
-void new_filters(VFiltros &VObjRdistance,pose const &robot,VObjetos &lfobjects);
+void new_filters(VFiltros &VObjRdistance,pose const &robot,const VObjetos &lfobjects);
+void DesacoploAngulos(VFiltros &Vf);
+

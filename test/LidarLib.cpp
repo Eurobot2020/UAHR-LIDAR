@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "UAHRLidarlib.hpp"
+#include "uahr_class.hpp"
 
 
 // Bring in gtest
@@ -259,6 +259,9 @@ TEST(UAHRLidar, UAHRObjectsAngles)
     ObjectsAngles(robot,baliza_sup,vf);
 
     //EXPECT_EQ((int)dist.distance,(int)1760.21);
+    EXPECT_EQ((int)vf.size(),1);
+    EXPECT_EQ((int)vf[0].motivo,OBJETO);
+
     EXPECT_EQ((int)vf[0].rpose.arco.start,68);
     EXPECT_EQ((int)vf[0].rpose.arco.end,88);
     

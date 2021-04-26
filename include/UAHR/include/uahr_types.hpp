@@ -1,9 +1,11 @@
 // 
 #pragma once
-#include <vector.h>
+#include <vector>
+#include "uahr_msgs/Polar.h"
 #include "uahr_msgs/PolarArray.h"
-using VPolars = uahr_msgs::PolarArray;
-using VVPolars = vector<uahr_msgs::PolarArray>;
+#include "geometry_msgs/Pose2D.h"
+
+
 
 // Defines:
 #define OBJETO  'O'
@@ -12,6 +14,18 @@ using VVPolars = vector<uahr_msgs::PolarArray>;
 #define FA       3
 #define FD       0.1  
 // Estructuras
+struct polar 
+{
+    float angle;
+    float dist;
+    polar(float _angle,float _dist) : 
+    angle{_angle},dist{_dist}{}
+
+};
+
+using VPolars  = std::vector<polar>;
+using VVPolars = std::vector<VPolars>;
+
 struct pose
 {
     float x;

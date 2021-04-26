@@ -11,7 +11,6 @@
 #include "ros/ros.h"
 #include "rplidar.h"
 #include "geometry_msgs/Pose2D.h"
-
 /////// Mensajes del equipo:
 #include "uahr_msgs/Polar.h"
 #include "uahr_msgs/PolarArray.h"
@@ -33,6 +32,7 @@
 #define LIMY 1000
 #define N_2PI 2*M_PI
 #define LIDAR_RANGE_MIN 150 // mm
+#define MAX_DISANCE_ENEMY 3100
 
 using namespace rp::standalone::rplidar;
 
@@ -229,7 +229,8 @@ void publish_scan(ros::Publisher *pub_robots,
     pub_robots->publish(VPA);
     VPA.array.clear();
     
-    for(int i=0; i<lfobjects.size();i++)
+    // OJO QUE ESTO SE HA CAMBIADO
+    for(int i=0; i<4;i++)
     {
         if(pose_objeto[i][0]!= 0)
         {
@@ -365,7 +366,12 @@ int main(int argc, char * argv[])
         nh.getParam(name_a, ptheta);
         nh.getParam(name_m, modo);
         nh.getParam(name_objs,ejemplos_list);
-
+            
+        struct pose robot;
+        robot.x = px;
+        robot.y = py;
+        robot.theta = ptheta;
+    
         if(!((ejemplos_list.size()-1) % 4))
         {
             for(int j=0; j<ejemplos_list[0]*4; j=j+4)
@@ -413,14 +419,8 @@ int main(int argc, char * argv[])
     ros::Publisher  pub_robots = nh.advertise<uahr_msgs::PolarArray>("lidar_robots", 1000);
     ros::Publisher  pub_objs   = nh.advertise<uahr_msgs::PolarArray>("lidar_distance", 1000);
 
-    
-    struct pose robot;
-    robot.x = px;
-    robot.y = py;
-    robot.theta = ptheta;
-    
+
     ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");
-    VObjRdistance = new_filters(robot, lfobjects);
     ROS_INFO("Configure finish");
 
 

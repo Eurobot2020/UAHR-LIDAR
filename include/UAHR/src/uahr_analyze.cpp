@@ -2,8 +2,9 @@
 
 // Filtro por 
 void FilterScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
-    &VFiltros Vfiltros, &Seccion enemy_distance,
-    &VVPolars Vobjetos, &VPolars Vrobots)
+    const float &angle_max, const float &angle_increment,
+    VFiltros &Vfiltros, Seccion &enemy_distance,
+    VVPolars &Vobjetos, VPolars &Vrobots)
 {
     float angulo;
     float distance;
@@ -11,19 +12,20 @@ void FilterScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
     for (size_t i = 0; i < node_count; i++)
     {
         angulo = angle_max - angle_increment * i;
-        if (InSection(angulo,filtro.angle))
+        if (InSection(angulo,filtro->rpose.arco))
         {
             // Calculamos el valor de la distancia
             distance = (float) nodes[i].dist_mm_q2/4.0f;
-            switch (filter->motivo)
+            switch (filtro->motivo)
             {
                 case OBJETO:
-                    if (InSection(distance,filtro->distance))
+                    if(InSection(distance,filtro->rpose.distance))
                     {
                         if (filtro->salto && angulo<180)
-                            Vobjetos[filtro->type].emplace_back(angulo+360,distance);
+                            
+                            Vobjetos[filtro->tipo].emplace_back(angulo+360,distance);
                         else
-                            Vobjetos[filtro->type].emplace_back(angulo,distance);
+                            Vobjetos[filtro->tipo].emplace_back(angulo,distance);
                     }   
                 break;
                 
@@ -35,13 +37,13 @@ void FilterScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
                 break;
                 
                 case AMBOS:
-                    if (InSection(distance,filtro.distance))
+                    if(InSection(distance,filtro->rpose.distance))
                     {
-                        if (filtro.salto && angulo<180)
-                            Vobjetos[filtro->type].emplace_back(angulo+360,distance);
+                        if (filtro->salto && angulo<180)
+                            Vobjetos[filtro->tipo].emplace_back(angulo+360,distance);
                         else
-                            Vobjetos[filtro->type].emplace_back(angulo,distance);
-                    }   
+                            Vobjetos[filtro->tipo].emplace_back(angulo,distance);
+                    } 
                     else if(InSection(distance,enemy_distance))
                     {
                         Vrobots.emplace_back(angulo,distance);
@@ -50,7 +52,7 @@ void FilterScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
             }
         }
         
-        else if(filtro != VFiltros.begin())
+        else if(filtro != Vfiltros.begin())
             --filtro;
     }
 }
@@ -58,21 +60,23 @@ void FilterScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
 
 
 // Analisis objetos
-void objeto_clusters(&VVPolars Vscans,&VPolars Vposes)
+void ObjectClusters(VVPolars &Vscans,uahr_msgs::PolarArray Vposes)
 {
     for (auto & objeto : Vscans)
     {
-        // Creo el polar al objeto
-        Vposes.emplace_back(0,0);
+        // Creo el polar al objeto 
+        // el constructor lo inicaliza
+        // a 0,0
+        Vposes.array.emplace_back();
         if(objeto.size())
         {
-            auto center = Vpose.back()
+            auto &center = Vposes.array.back();
             // Cáculo la media, podria cambiarse 
             // por un filtro exigente:
             for (auto & polar : objeto)
             {
-                center.dist  += objeto.dist;
-                center.angle += objeto.angle
+                center.dist  += polar.dist;
+                center.angle += polar.angle;
             }
             center.dist  /= objeto.size();
             center.angle /= objeto.size();
@@ -80,9 +84,11 @@ void objeto_clusters(&VVPolars Vscans,&VPolars Vposes)
     }
 }
 
-void enemy_clusters(&VPolars Vscans, &VPolars Venemies)
+void enemy_clusters(VPolars &Vscans, VPolars &Venemies)
 {
+    int a =0;
     // Doble filtro:
+    /*
     uahr_msgs::PolarArray;
     cluster
     // Recorro el véctor en busca de posibles clusters
@@ -103,18 +109,18 @@ void enemy_clusters(&VPolars Vscans, &VPolars Venemies)
 
     }
     for ()
-
+    */
 }
 
 void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
-                &VFiltros Vfiltros,  &Seccion enemy_distance,
-                &VVPolars Vobjetos,  &VPolars Vrobots,
-                &VPolars Vpubposes,  &VPolars Vpubrobots )
+                const float &angle_max, const float &angle_increment,
+                VFiltros & Vfiltros,  Seccion &enemy_distance,
+                VVPolars & Vobjetos,  VPolars &Vrobots,
+                uahr_msgs::PolarArray  &Vpubposes,  uahr_msgs::PolarArray &Vpubrobots )
 {
-    FilterScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
-            VFiltros Vfiltros,  Seccion enemy_distance,
-            VVPolars Vobjetos,  VVPolars Vrobots);
+    FilterScan(nodes,node_count,angle_max, angle_increment,
+            Vfiltros,enemy_distance,Vobjetos, Vrobots);
             
-    ObjectClusters(VVPolarrs Vobjetos, VPolars Vpubposes);
-    EnemyClusters(VVPolarrs  Vrobots,  VPolars Vpubrobots);
+    ObjectClusters(Vobjetos, Vpubposes);
+    //EnemyClusters(VVPolarrs  Vrobots,  VPolars Vpubrobots);
 }
