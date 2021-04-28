@@ -121,6 +121,7 @@ void RPLidarScanToCluster(rplidar_response_measurement_node_hq_t *nodes,size_t n
                     else break;
                 }
             
+                /*
                 for (int j= 0;j<Vclusters.size();++j)
                 {
                     if((angulo-Vclusters[j].back().angle)<5)
@@ -134,6 +135,7 @@ void RPLidarScanToCluster(rplidar_response_measurement_node_hq_t *nodes,size_t n
                     }
                     else break;
                 }
+                */
                 if(!cluster_find)
                 {
                     Vclusters.emplace_back();
@@ -239,29 +241,18 @@ void AnalyzeScan2(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
                 Vclusters,Vfiltros,max_distance);
     
 
-    
-    /*
-    std::cout<<"Wueno dia"<<std::endl;
-    for (int i=0; i < Vclusters.size();++i)
-    {
-        std::cout<<"El cluster "<<i<<"cuenta con " << Vclusters[i].size()<<" haces y esta compuesto por: "<<std::endl;
-        for (auto & objeto : Vclusters[i])
-        {
-            std::cout<<"Angulo "<<objeto.angle<<" Distancia "<<objeto.dist<<std::endl;
-        }
-    }
-    */
 
     VVPolars Vclusters2;
     Vclusters2.reserve(Vclusters.size());
-    std::copy_if(Vclusters.begin(),Vclusters.end(),std::back_inserter(Vclusters2),[&](VPolars  cluster)
+    
+    
+    /*std::copy_if(Vclusters.begin(),Vclusters.end(),std::back_inserter(Vclusters2),[&](VPolars  cluster)
     {
-        if ((cluster.size()>1)  &&     
-        (((cluster.back().dist>1200) && (cluster.size()<4))
+        if (((cluster.back().dist>1200) && (cluster.size()<4))
         ||
         ((cluster.back().dist>800) && (cluster.size()<6))
         ||
-        ((cluster.back().dist<=800) && (cluster.size()<22))))
+        ((cluster.back().dist<=800) && (cluster.size()<20)))
         {
             return true;
         }
@@ -269,17 +260,16 @@ void AnalyzeScan2(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
         {
             return false;
         }
-    });
+    });*/
 
     // Hago la media de los clusters
-    for (auto & cluster : Vclusters2)
+    for (auto & cluster : Vclusters)
     {
+        std::cout<<"Size "<<cluster.size()<<std::endl;
         uahr_msgs::Polar polar = MeanCluster(cluster);
         Vpubrobots.array.emplace_back(polar);
         std::cout<<"Angulo "<<polar.angle<<" Distancia "<<polar.dist<<std::endl;
     }
-    std::cout<<"SALGO "<<std::endl;
-
 }
 
 
@@ -354,6 +344,7 @@ void EnemyClusters(VPolars &Vscans, uahr_msgs::PolarArray &Vrobots)
 
 
     float last_dist; 
+    /*
     for (int i=0; i < posible_clusters.size();++i)
     {
 
@@ -362,7 +353,7 @@ void EnemyClusters(VPolars &Vscans, uahr_msgs::PolarArray &Vrobots)
         {
             std::cout<<"Angulo "<<objeto.angle<<" Distancia "<<objeto.dist<<std::endl;
         }
-    }
+    }*/
         
     for(auto & cluster : posible_clusters)
     {

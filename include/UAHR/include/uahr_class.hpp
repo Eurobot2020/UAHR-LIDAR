@@ -103,7 +103,7 @@ void LidarHandler::new_scan2(rplidar_response_measurement_node_hq_t *nodes, size
     this->Vpubrobots.array.clear();
 
     // Actualizo la posición del robot:
-    float max_distance = 3100;
+    float max_distance = 3000;
     
 
     // Calculamos los nuevos filtros:

@@ -36,7 +36,7 @@ include_directories(
 catkin_package()
 
 add_executable(uahr_lidar_node src/uahrlidar.cpp ${RPLIDAR_SDK_SRC} ${UAHR_SRC})
-target_compile_options (uahr_lidar_node PRIVATE -Wall -pedantic)
+target_compile_options (uahr_lidar_node PRIVATE -Wall -pedantic -o3)
 target_link_libraries(uahr_lidar_node ${catkin_LIBRARIES})
 
 add_executable(rplidarNode src/node.cpp ${RPLIDAR_SDK_SRC})
