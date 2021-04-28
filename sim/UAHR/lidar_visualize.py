@@ -9,7 +9,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import Pose2D, Point
 from std_msgs.msg import String
 
-from Fast_rviz import new_cube, new_line, size
+from Fast_rviz import new_cube, new_line, size, new_circunferance
 from uahr_msgs.msg import PolarArray, array_arcos, Pose2DArray
 
 
@@ -22,7 +22,6 @@ def cb_recognized_objects(msg):
                 math.cos(math.radians(relative_poses.angle + pose.theta)))
         endy = (pose.y + relative_poses.dist *
                 math.sin(math.radians(relative_poses.angle + pose.theta)))
-
         all_objects.markers[i].points = [Point(
             pose.x / SF,
             pose.y / SF,
@@ -30,9 +29,31 @@ def cb_recognized_objects(msg):
             Point(endx/SF, endy/SF, 0)]
     pub_recognized_objects.publish(all_objects)
 
+def cb_arcos(msg):
+    arcos = []
+    for i, arco in enumerate(msg.arcos):
+        if(arco.motivo == 'R'):
+            color = 'r'
+            #arco.distance_inf =100
+            arco.distance_sup = 500
+
+        elif(arco.motivo == 'A'):
+            color = 'b'
+
+        elif(arco.motivo == 'O'):
+            color = 'g'
+
+        arcos.append(new_circunferance(SF, str(i)+"_chiquito", pose,
+                     arco.distance_inf, arco.angle_inf, arco.angle_sup, color))
+
+        arcos.append(new_circunferance(SF, str(i)+"_grande", pose,
+                     arco.distance_sup, arco.angle_inf, arco.angle_sup, color))
+
+    pub_arcos.publish(arcos)
+
+
+
 # LINEAR ROJAS
-
-
 def cb_enemy_robots(msg):
 
     for i in range(len(enemy_line_list)):
@@ -71,19 +92,15 @@ if __name__ == "__main__":
     pose_alfa = rospy.get_param(name_a, 0)
     pose = Pose2D(pose_x, pose_y, pose_alfa)
 
-    sub_recognized_objects = rospy.Subscriber("lidar_distance",
-                                              PolarArray, callback=cb_recognized_objects)
-    sub_enemy_robots = rospy.Subscriber("lidar_robots",
-                                        PolarArray, callback=cb_enemy_robots)
-
+    
     pub_robot_marker_pose = rospy.Publisher(
         "pose_marker", Marker, queue_size=10)
     pub_recognized_objects = rospy.Publisher(
         "triangulate_objects", MarkerArray, queue_size=10)
     pub_recognized_robots = rospy.Publisher(
         "enemy_markers", MarkerArray, queue_size=10)
-
-    pub_pose = rospy.Publisher("pose", Pose2D, queue_size=10)
+    pub_arcos = rospy.Publisher(
+        "rviz_robot_filters", MarkerArray, queue_size=10)
 
     SF = 100  # Factor de escalado
 
@@ -95,7 +112,7 @@ if __name__ == "__main__":
     robot_marker = new_cube(SF, "robot", pose, size(144, 300, 350), 'b')
 
     enemy_line_list = []
-    for i in range(10):
+    for i in range(400):
         enemy_line_list.append('LE'+str(i))
         i += 1
 
@@ -107,6 +124,17 @@ if __name__ == "__main__":
     for i in enemy_line_list:
         line_to_object = new_line(i, Point(0, 0, 0), Point(0, -1, 0), 'r')
         all_enemies.markers.append(line_to_object)
+
+    sub_recognized_objects = rospy.Subscriber("lidar_distance",
+                                              PolarArray, callback=cb_recognized_objects)
+    sub_enemy_robots = rospy.Subscriber("lidar_robots",
+                                        PolarArray, callback=cb_enemy_robots)
+
+    sub_arcos = rospy.Subscriber("arcos", array_arcos, callback=cb_arcos)
+
+
+
+
     time.sleep(1)
     pub_robot_marker_pose.publish(robot_marker)
     rospy.spin()

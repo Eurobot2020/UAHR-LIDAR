@@ -5,9 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Grid1/Offset1
-        - /Pose1
-        - /Objetos1
-        - /Enemigos1
+        - /Arcos1
       Splitter Ratio: 0.5
     Tree Height: 341
   - Class: rviz/Selection
@@ -59,7 +57,7 @@ Visualization Manager:
       Marker Topic: pose_marker
       Name: Pose
       Namespaces:
-        {}
+        robot: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -67,10 +65,7 @@ Visualization Manager:
       Marker Topic: triangulate_objects
       Name: Objetos
       Namespaces:
-        Baliza_abajo: true
-        Baliza_arriba: true
-        Baliza_intermedia: true
-        Torre: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -78,16 +73,15 @@ Visualization Manager:
       Marker Topic: enemy_markers
       Name: Enemigos
       Namespaces:
-        LE0: true
-        LE1: true
-        LE2: true
-        LE3: true
-        LE4: true
-        LE5: true
-        LE6: true
-        LE7: true
-        LE8: true
-        LE9: true
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: rviz_robot_filters
+      Name: Arcos
+      Namespaces:
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -133,9 +127,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0202075242996216
+      Pitch: 1.2252072095870972
       Target Frame: <Fixed Frame>
-      Yaw: 1.76311194896698
+      Yaw: 2.5481116771698
     Saved:
       - Class: rviz/Orbit
         Distance: 30

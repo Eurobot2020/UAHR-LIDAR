@@ -1,7 +1,7 @@
 <launch>
     <node pkg="rviz" name="rviz_lidar" type="rviz" args="-d $(find uahr_lidar)/sim/UAHR/UAHR_Lidar.rviz"/>
     <node pkg="uahr_lidar" name="Refresh_Rviz" type="lidar_visualize.py"/>
-    <param name="pose_x"              type="int"    value="0"/>
+    <param name="pose_x"              type="int"    value="1430"/>
     <param name="pose_y"              type="int"    value="0"/>
     <param name="pose_alfa"           type="int"    value="0"/>
     <rosparam command="load"          file="$(find uahr_lidar)/config/yamls/coordenadas_amarillo.yaml" />

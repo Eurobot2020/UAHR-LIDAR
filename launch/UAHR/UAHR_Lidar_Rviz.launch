@@ -9,7 +9,7 @@
             <param name="inverted"            type="bool"   value="false"/>
             <param name="angle_compensate"    type="bool"   value="true"/>
         </node>
-        <param name="pose_x"              type="int"    value="0"/>
+        <param name="pose_x"              type="int"    value="1440"/>
         <param name="pose_y"              type="int"    value="0"/>
         <param name="pose_alfa"           type="int"    value="0"/>
         <rosparam command="load"          file="$(find uahr_lidar)/config/yamls/coordenadas_amarillo.yaml" />

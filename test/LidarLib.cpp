@@ -279,7 +279,6 @@ TEST(UAHRLidar,RelativeAngle)
   FiltroAngular f;
   pose pr(0,0,45);
   VFiltros vdf;
-  
   f.rpose.arco.start = 10;
   f.rpose.arco.end  = 30;
   vdf.push_back(f);
@@ -328,8 +327,20 @@ TEST(UAHRLidar,RelativeAngle)
   EXPECT_EQ(vdf[6].rpose.arco.start,-180);
   EXPECT_EQ(vdf[6].rpose.arco.end,180);
 
-
+  pr.theta = 0;
+  
+  f.rpose.arco.start = 177;
+  f.rpose.arco.end   = -177;
+  vdf.push_back(f);
+  //vdf.push_back(f);
+  RelativeAngle(vdf[7],pr,vdf);
+  EXPECT_EQ(vdf.size(),9);
+  EXPECT_EQ(vdf[7].rpose.arco.start,-180);
+  EXPECT_EQ(vdf[7].rpose.arco.end,-177);
+  EXPECT_EQ(vdf[8].rpose.arco.start,177);
+  EXPECT_EQ(vdf[8].rpose.arco.end,180);
 }
+
 
 TEST(UAHRLidar, DesacoploAngulos)
 {

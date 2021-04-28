@@ -41,12 +41,6 @@ RPlidarDriver * drv = NULL;
 
 std::vector<FiltroAngular> VObjRdistance;
 
-//  int fil_angular[4] {FA+10,FA+10,FA/2,FA};
-//  int fil_angular[4] {FA,FA,FA,FA};
-
-ros::Publisher  pub_arcos;
-
-
 
 void publish_scan(ros::Publisher *pub_robots,
                   ros::Publisher *pub_objects,
@@ -55,20 +49,16 @@ void publish_scan(ros::Publisher *pub_robots,
                   double scan_time, bool inverted,
                   float  angle_min, float angle_max,
                   float  range_max,
-                  std::string frame_id)
-{
-    
+                  LidarHandler &handler)
+{    
     bool  reversed = (angle_max > angle_min);
     float angle_increment;
     float angulo;
     int   cluster = 0;
-    int   x;
     float aux;
-
+    static int flag= 0;
     uahr_msgs::PolarArray VPA;
 
-    int   pose_objeto[4][3] = {0};
-    float read_value = 0;
 
     if (reversed) {
       aux = angle_min;
@@ -83,149 +73,23 @@ void publish_scan(ros::Publisher *pub_robots,
     angle_increment = (angle_max - angle_min) / (double)(node_count-1);
     bool reverse_data = (!inverted && reversed) || (inverted && !reversed);
     
-    
-
-    // Soy culpable de esto    
-    aux = 0;    
-    uahr_msgs::Polar robot_cluster;
-    
+        
     // Analiza los datos:
     if (!reverse_data) {
-        x=0;
-
         // Calculo el ángulo
         for (size_t i = 0; i < node_count; i++) {
             angulo = angle_min + angle_increment * i;
         }
     }
-                
-    else 
-    {
-        x = VObjRdistance.size() - 1;        
-        
-        for (size_t i = 0; i < node_count; i++) {
-            angulo = angle_max - angle_increment * i;
-            //ROS_INFO("183");
-            
-            // Si el angulo es interesante lo analizo
-            if((VObjRdistance[x].rpose.arco.start<angulo)&&(angulo<VObjRdistance[x].rpose.arco.end))
-            {   
-
-                // Calculamos el valor de la distancia
-                read_value = (float) nodes[i].dist_mm_q2/4.0f;
-
-                //Si el valor esta entre los umbrales lo analizo:
-                if((read_value>LIDAR_RANGE_MIN) && (read_value<3300))
-                {                    
-                    
-                    // Dependiendo de si que lo que espero es un robot o un objeto
-                    // conocido hago una cosa u otra:
-                    switch (VObjRdistance[x].motivo)
-                    {
-                        // Si es un objeto para triangular:
-                        case OBJETO:     
-                            // Esta a la distancia esperada con un factor de seguridad?
-                            if (
-                            (VObjRdistance[x].rpose.distance.start <= read_value)
-                            &&
-                            (read_value <= VObjRdistance[x].rpose.distance.end))
-                            {
-                                pose_objeto[VObjRdistance[x].tipo-1][0]++;
-                                pose_objeto[VObjRdistance[x].tipo-1][1] += read_value;
-                                if(!VObjRdistance[x].salto)
-                                    pose_objeto[VObjRdistance[x].tipo-1][2] += angulo;
-                                else 
-                                    pose_objeto[VObjRdistance[x].tipo-1][2] += angulo + 360;   
-                            }
-                            break;
-
-                        case ROBOT:
-
-                            // Es conocido el robot?
-                        
-                            // No es conocido
-
-                            // Si hay una diferencia muy grande probar con menos
-
-                            //ROS_INFO("Robot %f ", read_value);
-
-                            if(abs(read_value - aux) > 200 && (read_value<MAX_DISANCE_ENEMY))
-                            {
-                                // Si hay más de cuatro haces seguidos consideramos que
-                                // es un robot:
-
-                                if(cluster >=2)
-                                {
-                           
-                                    robot_cluster.dist  = robot_cluster.dist/cluster;
-                                    robot_cluster.angle = robot_cluster.angle/cluster;         
-                                    VPA.array.push_back(robot_cluster);
-
-                                }
-                                //ROS_INFO("Reset cluster");
-
-                                cluster             = 0;
-                                robot_cluster.dist  = 0;
-                                robot_cluster.angle = 0;
-                                aux = 0;
-                            } 
-
-                            robot_cluster.dist   += read_value;
-                            robot_cluster.angle  += angulo; 
-                            cluster++;
-                            aux = read_value;
-                        break;
-
-                        case AMBOS:
-                            //ROS_INFO("Ambos %f ", read_value);
-
-                            // Lo que encuentro es el objeto en el que pensaba triangular?
-                            if ((VObjRdistance[x].rpose.distance.start <= read_value)
-                                &&
-                                (read_value <= VObjRdistance[x].rpose.distance.end))
-                            {
-                                pose_objeto[VObjRdistance[x].tipo-1][0]++;
-                                pose_objeto[VObjRdistance[x].tipo-1][1] += read_value;
-                                if(VObjRdistance[x].salto && angulo < 0)
-                                    pose_objeto[VObjRdistance[x].tipo-1][2] += angulo + 360;   
-                                else 
-                                    pose_objeto[VObjRdistance[x].tipo-1][2] += angulo;
-                            }
-                            else
-                            {
-                                if(abs(read_value - aux) > 200 && (read_value<MAX_DISANCE_ENEMY))
-                                {
-                                    // es un robot:
-                                    // Si hay más de cuatro haces seguidos consideramos que
-                                    if(cluster >=2)
-                                    {
-                                        robot_cluster.dist  = robot_cluster.dist/cluster;
-                                        robot_cluster.angle = robot_cluster.angle/cluster;      
-                                        VPA.array.push_back(robot_cluster);
-                         
-                                    }
-                                    cluster             = 0;
-                                    robot_cluster.dist  = 0;
-                                    robot_cluster.angle = 0;
-                                    aux = 0;
-
-                                } 
-                                robot_cluster.dist   += read_value;
-                                robot_cluster.angle  += angulo; 
-                                cluster++;
-                                aux = read_value;
-                            }
-                        break;
-                }        
-            }
-        }
-                
-        // Si se ha pasado el arco de interes cambiamos el arco:
-        else if((x!=0) &&(angulo<VObjRdistance[x].rpose.arco.start))
-            x--;
-    }            
+    else{
+        handler.new_scan2(nodes,node_count, angle_max,angle_increment);
+        pub_objects->publish(handler.Vpubtriangulate);
+        pub_robots->publish(handler.Vpubrobots);
     }
-    
+}
+
+
+/*    
     pub_robots->publish(VPA);
     VPA.array.clear();
     
@@ -247,7 +111,7 @@ void publish_scan(ros::Publisher *pub_robots,
         }
     }
     pub_objects->publish(VPA);
-}
+    */           
 
 bool getRPLIDARDeviceInfo(RPlidarDriver * drv)
 {
@@ -311,7 +175,6 @@ int main(int argc, char * argv[])
     std::string serial_port;
     int tcp_port = 20108;
     int serial_baudrate = 115200;
-    std::string frame_id;
     bool inverted = false;
     bool angle_compensate = true;
     float max_distance = 8.0;
@@ -325,7 +188,6 @@ int main(int argc, char * argv[])
     nh_private.param<int>("tcp_port", tcp_port, 20108);
     nh_private.param<std::string>("serial_port", serial_port, "/dev/rplidar"); 
     nh_private.param<int>("serial_baudrate", serial_baudrate, 115200/*256000*/);//ros run for A1 A2, change to 256000 if A3
-    nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
     nh_private.param<bool>("inverted", inverted, false);
     nh_private.param<bool>("angle_compensate", angle_compensate, false);
     nh_private.param<std::string>("scan_mode", scan_mode, std::string());
@@ -338,7 +200,6 @@ int main(int argc, char * argv[])
     std::string name_a;
     std::string name_objs;
     int fil_angular[4] {FA+10,FA+10,FA/2,FA};
-    ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");
     std::vector<ObjSearchData> lfobjects;
 
     std::string modo;
@@ -347,6 +208,7 @@ int main(int argc, char * argv[])
     int py;
     int ptheta;
 
+    struct pose robot;
     ros::Subscriber sub_pose;
     
 
@@ -367,7 +229,6 @@ int main(int argc, char * argv[])
         nh.getParam(name_m, modo);
         nh.getParam(name_objs,ejemplos_list);
             
-        struct pose robot;
         robot.x = px;
         robot.y = py;
         robot.theta = ptheta;
@@ -376,7 +237,7 @@ int main(int argc, char * argv[])
         {
             for(int j=0; j<ejemplos_list[0]*4; j=j+4)
             {
-                lfobjects.push_back(ObjSearchData{ejemplos_list[j+1],ejemplos_list[j+2], ejemplos_list[j+3],ejemplos_list[j+4],0});
+                lfobjects.push_back(ObjSearchData{ejemplos_list[j+1],ejemplos_list[j+2], ejemplos_list[j+3],ejemplos_list[j+4],j/4});
             }
 
             for(int i = 0; i<ejemplos_list[0]; i++)
@@ -392,18 +253,6 @@ int main(int argc, char * argv[])
             ros::shutdown();
         } 
         
-        if(modo=="demo")
-        {
-            class LidarHandler Handler(lfobjects,robot);
-            sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
-            pub_arcos  = nh.advertise<uahr_msgs::array_arcos>("arcos", 1000);
-            ROS_INFO("Configure demo");
-        }
-        else
-        {
-            class LidarHandler Handler(lfobjects,robot);
-            sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
-        }
         
         //n.getParam(, i);
     }
@@ -414,15 +263,19 @@ int main(int argc, char * argv[])
         ros::shutdown();
     }
 
- 
+    class LidarHandler Handler(lfobjects,robot);
+    sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
+
     // Eurobot publishers:
     ros::Publisher  pub_robots = nh.advertise<uahr_msgs::PolarArray>("lidar_robots", 1000);
     ros::Publisher  pub_objs   = nh.advertise<uahr_msgs::PolarArray>("lidar_distance", 1000);
+    ros::Publisher  pub_arcos  = nh.advertise<uahr_msgs::array_arcos>("arcos", 1000);;
 
 
     ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");
     ROS_INFO("Configure finish");
-
+    Handler.prompt_filters();
+    
 
 
     u_result     op_result;
@@ -522,9 +375,12 @@ int main(int argc, char * argv[])
     ros::Time end_scan_time;
     ros::Time start_scan_time;
     double scan_duration;
+
     while (ros::ok()) {
         rplidar_response_measurement_node_hq_t nodes[360*8];
         size_t   count = _countof(nodes);
+        pub_arcos.publish(Handler.pub_filters());
+
 
         start_scan_time = ros::Time::now();
         op_result = drv->grabScanDataHq(nodes, count);
@@ -563,7 +419,7 @@ int main(int argc, char * argv[])
                              angle_compensate_nodes, angle_compensate_nodes_count,
                              start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
-                             frame_id);
+                             Handler);
 
                 } else {
                     int start_node = 0, end_node = 0;
@@ -582,7 +438,7 @@ int main(int argc, char * argv[])
                             &nodes[start_node], end_node-start_node +1,
                             start_scan_time, scan_duration, inverted,
                             angle_min, angle_max, max_distance,
-                            frame_id);
+                            Handler);
                }
             } else if (op_result == RESULT_OPERATION_FAIL) {
                 // All the data is invalid, just publish them
@@ -592,7 +448,7 @@ int main(int argc, char * argv[])
                              nodes, count,
                              start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
-                             frame_id);
+                             Handler);
             }
         }
 

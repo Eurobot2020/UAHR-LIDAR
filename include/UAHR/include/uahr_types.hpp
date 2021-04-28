@@ -3,8 +3,10 @@
 #include <vector>
 #include "uahr_msgs/Polar.h"
 #include "uahr_msgs/PolarArray.h"
-#include "geometry_msgs/Pose2D.h"
+#include "uahr_msgs/array_arcos.h"
+#include "uahr_msgs/Arco_Interes.h"
 
+#include "geometry_msgs/Pose2D.h"
 
 
 // Defines:

@@ -226,26 +226,36 @@ void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf)
         // a -180 hay que partirlos
         if(f.rpose.arco.start > f.rpose.arco.end)                   
         {
-
             if(f.rpose.arco.start != 180)
+            {
                 if(f.rpose.arco.end != -180)
                 {    
+                    // Si no se hace asi puede que 
+                    // haya una relocalización
+                    // y el puntero se eche a perder
+                    float aux = f.rpose.arco.start;
+
+                    f.rpose.arco.start = -180.0;
+                    f.salto = true;
+                    
                     vdf.emplace_back(FiltroAngular(
-                        Seccion(f.rpose.arco.start,180),
+                        Seccion(aux,180),
                         f.rpose.distance,
                         f.motivo,
                         f.tipo,
                         true
-                        ));     
-                    f.rpose.arco.start = -180;
-                    f.salto = true;
+                        ));
+
                 }  
-
                 else
+                {
                     f.rpose.arco.end = 180;
-
+                }
+            }
             else
+            {
                 f.rpose.arco.start = -180;
+            }
         }
     }
 }
@@ -351,18 +361,29 @@ void new_filters(VFiltros &VObjRdistance,pose const &robot,const VObjetos &lfobj
     else if((robot.x>=0)&&(robot.y<=0))
         DangerAngles4C(robot,VObjRdistance);        
 
+    //VObjRdistance.emplace_back();
+
     // Calculo donde espero ver los objetos
-    std::for_each(lfobjects.begin(),lfobjects.end(),[&](ObjSearchData  obj)
-    {
-        ObjectsAngles(robot,obj,VObjRdistance);
-    });
+    //std::for_each(lfobjects.begin(),lfobjects.end(),[&](ObjSearchData  obj)
+    //{
+    //    ObjectsAngles(robot,obj,VObjRdistance);
+    //});
+    
 
     // Cambio todos los ángulosa ángulos relativos:
+    for(int i=VObjRdistance.size()-1;i>=0;--i)
+        RelativeAngle(VObjRdistance[i],robot,VObjRdistance);
+
+    /* // Problema con las referencias :( la versión de arriba funciona
     std::for_each(VObjRdistance.rbegin(),VObjRdistance.rend(),[&](FiltroAngular f)
     {
+        std::cout<<"Hola";
         RelativeAngle(f,robot,VObjRdistance);
-    });
+        //NewRelativeAngle(&f,robot,VObjRdistance);
 
+    });*/
+
+    //
     // Ordenamos los angulos para que analizarlo 
     // de manera ordenada desde el lidar:
     std::sort(VObjRdistance.begin(),VObjRdistance.end(),Compare_FiltroAngular);    
