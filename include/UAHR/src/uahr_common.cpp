@@ -2,13 +2,13 @@
 
 
 
-bool Compare_FiltroAngular(FiltroAngular a1, FiltroAngular a2)
+bool GenerarAcoples(Seccion a1, Seccion a2)
 {
-   if(a1.rpose.arco.start < a2.rpose.arco.start) {
+   if(a1.start < a2.start) {
       return true;
     }
-   else if(a1.rpose.arco.start == a2.rpose.arco.start) {
-        if(a1.rpose.arco.end < a2.rpose.arco.end) 
+    else if(a1.start == a2.start) {
+        if(a1.end > a2.end) 
             return true;
         else
             return false;

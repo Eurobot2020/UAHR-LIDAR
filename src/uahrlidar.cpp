@@ -39,7 +39,6 @@ using namespace rp::standalone::rplidar;
 RPlidarDriver * drv = NULL;
 
 
-std::vector<FiltroAngular> VObjRdistance;
 
 
 void publish_scan(ros::Publisher *pub_robots,
@@ -82,7 +81,7 @@ void publish_scan(ros::Publisher *pub_robots,
         }
     }
     else{
-        handler.new_scan2(nodes,node_count, angle_max,angle_increment);
+        handler.new_scan(nodes,node_count, angle_max,angle_increment);
         pub_objects->publish(handler.Vpubtriangulate);
         pub_robots->publish(handler.Vpubrobots);
     }
@@ -233,28 +232,13 @@ int main(int argc, char * argv[])
         robot.y = py;
         robot.theta = ptheta;
     
-        if(!((ejemplos_list.size()-1) % 4))
+        // TODO QUITAR ESTO Y HACER ALGO BUENO CON LOS YAMLS
+        for(int j=0; j<=6; j=j+2)
         {
-            for(int j=0; j<ejemplos_list[0]*4; j=j+4)
-            {
-                lfobjects.push_back(ObjSearchData{ejemplos_list[j+1],ejemplos_list[j+2], ejemplos_list[j+3],ejemplos_list[j+4],j/4});
-            }
-
-            for(int i = 0; i<ejemplos_list[0]; i++)
-            {    
-                ROS_INFO("%d",lfobjects[i].x_inf);
-                lfobjects[i].aexp = fil_angular[i]; 
-            }
+            lfobjects.push_back(ObjSearchData{ejemplos_list[j],ejemplos_list[j+1],j});
+            
         }
-        else
-        {
-            ROS_INFO("Error in the configuration");
-            // Shutdown this node
-            ros::shutdown();
-        } 
         
-        
-        //n.getParam(, i);
     }
     else{
         // PUB THE ERROR:
@@ -379,7 +363,7 @@ int main(int argc, char * argv[])
     while (ros::ok()) {
         rplidar_response_measurement_node_hq_t nodes[360*8];
         size_t   count = _countof(nodes);
-        pub_arcos.publish(Handler.pub_filters());
+        //pub_arcos.publish(Handler.pub_filters());
 
 
         start_scan_time = ros::Time::now();

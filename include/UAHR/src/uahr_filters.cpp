@@ -18,24 +18,24 @@ void DangerAngles1C(const pose &pr, VFiltros &vdf)
     if((LIMX - pr.x) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(fx,-fx));
+        vdf.emplace_back(fx,-fx);
     }
     if((LIMY - pr.y)< DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(180-fy,fy));            
+        vdf.emplace_back(180-fy,fy);            
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.emplace_back(Seccion(-180,180));
+        vdf.emplace_back(-180,180);
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
-    else if((vdf.size()==2) && (vdf[0].rpose.arco.start > vdf[1].rpose.arco.end))
+    else if((vdf.size()==2) && (vdf[0].start > vdf[1].end))
     {
-        vdf[0].rpose.arco.start = vdf[1].rpose.arco.start;
+        vdf[0].start = vdf[1].start;
         vdf.pop_back();
     }
 
@@ -56,24 +56,24 @@ void DangerAngles2C(const pose &pr, VFiltros &vdf)
     if((pr.x + LIMX) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((-LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(-fx,fx));
+        vdf.emplace_back(-fx,fx);
     }
     if((LIMY - pr.y) < DISTANCIA_SEGURIDAD) 
     {
         fy = RAD2DEG(asin((LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(180-fy,fy));            
+        vdf.emplace_back(180-fy,fy);            
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.emplace_back(Seccion(-180,180));
+        vdf.emplace_back(-180,180);
         return;
     }
     // Caso especial hay entrelazamiento entre los dos ángulos:
-    else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
+    else if((vdf.size()==2) && (vdf[1].start>=vdf[0].end))
     {
-        vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;
+        vdf[0].end = vdf[1].end;
         vdf.pop_back();
     }
 
@@ -97,23 +97,23 @@ void DangerAngles3C(const pose &pr, VFiltros &vdf)
     if((pr.x + LIMX) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((-LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(-fx,fx));
+        vdf.emplace_back(-fx,fx);
     }
     if((pr.y + LIMY) < DISTANCIA_SEGURIDAD) 
     {
         fy  = RAD2DEG(asin((-LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(fy,-180 - fy));        
+        vdf.emplace_back(fy,-180 - fy);        
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.emplace_back(Seccion(-180,180));
+        vdf.emplace_back(-180,180);
         return;
     }
-    else if((vdf.size()==2) && (vdf[0].rpose.arco.start >= vdf[1].rpose.arco.end))
+    else if((vdf.size()==2) && (vdf[0].start >= vdf[1].end))
     {
-        vdf[0].rpose.arco.start = vdf[1].rpose.arco.start;
+        vdf[0].start = vdf[1].start;
         vdf.pop_back();
     }
     return;
@@ -134,34 +134,33 @@ void DangerAngles4C(const pose &pr, VFiltros &vdf)
     if((LIMX - pr.x) < DISTANCIA_SEGURIDAD) 
     {
         fx = RAD2DEG(acos((LIMX - pr.x)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(fx,-fx));
+        vdf.emplace_back(fx,-fx);
     }
     if((pr.y + LIMY) < DISTANCIA_SEGURIDAD) 
     {
         fy  = RAD2DEG(asin((-LIMY - pr.y)/DISTANCIA_SEGURIDAD));
-        vdf.emplace_back(Seccion(fy,-180 - fy));        
+        vdf.emplace_back(fy,-180 - fy);        
     }
 
     // Caso especial no hay ángulos seguros en esta posición:
     if(!vdf.size())
     {
-        vdf.emplace_back(Seccion(-180,180));
+        vdf.emplace_back(-180,180);
         return;
     }
     // Caso especial no hay ángulos seguros en esta posición:
-    else if((vdf.size()==2) && (vdf[1].rpose.arco.start>=vdf[0].rpose.arco.end))
+    else if((vdf.size()==2) && (vdf[1].start>=vdf[0].end))
     {
-        vdf[0].rpose.arco.end = vdf[1].rpose.arco.end;
+        vdf[0].end = vdf[1].end;
         vdf.pop_back();
     }
     return;
 }
 
 
-void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &vf)
+void ObjectsAngles(const pose &p_obs,ObjSearchData &pasive_obj,VFiltros &vf)
 {
     /*
-        ObjectsAngles :: pose -> ObjSearchData -> Int -> Corona
 
         Calcula la corona angular en la que se debe 
         encontar el objeto, esta corona es relativa
@@ -172,223 +171,115 @@ void ObjectsAngles(const pose &p_obs,const ObjSearchData &pasive_obj,VFiltros &v
                      triangular.
     */ 
 
-    float aoi, aos,adiff,dxi,dyi,di,ds,dxs,dys;
-    // Intento construir el elemento directamente,
-    // en el heap
-    vf.emplace_back(OBJETO,pasive_obj.id);     
-    FiltroAngular &f = vf.back();
-
+    float ao,dx,dy;
+    
     // Calculo la distancia desde el observador
     // hasta las distintas partes del objeto:
-    dxi = pasive_obj.x_inf - p_obs.x;
-    dyi = pasive_obj.y_inf - p_obs.y;
-    dxs = pasive_obj.x_sup - p_obs.x;
-    dys = pasive_obj.y_sup - p_obs.y;
+    dx = pasive_obj.x - p_obs.x;
+    dy = pasive_obj.y - p_obs.y;
+    ao  = M180(RAD2DEG(atan2(dy,dx)));
+    pasive_obj.rpose.angle = ao;
+    pasive_obj.rpose.dist = sqrt(dx*dx+dy*dy);
 
-    // Calculo el ańgulo hasta la parte superior
-    // y la parte inferior del objeto:
-    aoi  = M180(RAD2DEG(atan2(dyi,dxi)));
-    aos  = M180(RAD2DEG(atan2(dys,dxs)));
-    adiff = M180(aos-aoi);
-
-    // En el filto aumento un poco los ángulos de 
-    // la corona dependiendo de un factor de 
-    // seguridad:        
-    if(adiff>0)
-    {   
-        f.rpose.arco.start = M180(aoi - FA/adiff * pasive_obj.aexp);
-        f.rpose.arco.end   = M180(aos + FA/adiff * pasive_obj.aexp);
-    }
-    else
-    {
-        f.rpose.arco.start = M180(aos + FA/adiff * pasive_obj.aexp);
-        f.rpose.arco.end   = M180(aoi - FA/adiff * pasive_obj.aexp);
-    }
-    
-
-    // Calculo la distancia hasta el objeto.
-    di = sqrt(dxi*dxi+dyi*dyi);
-    ds = sqrt(dxs*dxs+dys*dys);
-    f.rpose.distance.start = (1 - pasive_obj.dexp) * (di+ds)/2;
-    f.rpose.distance.end   = (1 + pasive_obj.dexp) * (di+ds)/2;
-    f.motivo = OBJETO;
-    f.tipo   = pasive_obj.id;
+    // Intento construir el elemento directamente,
+    // en el heap
+    vf.emplace_back(ao-FA,ao+FA);
 }
 
-void RelativeAngle(FiltroAngular &f ,const pose &pr,VFiltros &vdf)
-{
-    if(!((f.rpose.arco.start == -180) && (f.rpose.arco.end == 180)))
-    {    
-        f.rpose.arco.start = M180(f.rpose.arco.start - pr.theta);
-        f.rpose.arco.end   = M180(f.rpose.arco.end   - pr.theta);
-
-        // Si al hacerlos relativos pasan desde 180
-        // a -180 hay que partirlos
-        if(f.rpose.arco.start > f.rpose.arco.end)                   
-        {
-            if(f.rpose.arco.start != 180)
-            {
-                if(f.rpose.arco.end != -180)
-                {    
-                    // Si no se hace asi puede que 
-                    // haya una relocalización
-                    // y el puntero se eche a perder
-                    float aux = f.rpose.arco.start;
-
-                    f.rpose.arco.start = -180.0;
-                    f.salto = true;
-                    
-                    vdf.emplace_back(FiltroAngular(
-                        Seccion(aux,180),
-                        f.rpose.distance,
-                        f.motivo,
-                        f.tipo,
-                        true
-                        ));
-
-                }  
-                else
-                {
-                    f.rpose.arco.end = 180;
-                }
-            }
-            else
-            {
-                f.rpose.arco.start = -180;
-            }
-        }
-    }
-}
-
-
-
-void DesacoploAngulos(VFiltros &Vf)
+void AcoploAngulos(VFiltros &Vf)
 {   
     int i = 0;
     float aux_angle;
-    // Cambiar por punteros?
+
+    // TODO
+    // Podria intentar ser más rapida si cambiamos el erase.
+    // pero de momento da robustez ante muchos casos
     while(i<Vf.size()-1)
     {
         // Existe acoplamiento entre dos angulos de interes?
-        if(Vf[i+1].rpose.arco.start<Vf[i].rpose.arco.end)
+        if(Vf[i+1].start<Vf[i].end)
         {
             // El primer filtro solo contiene parte del segundo filtro
-            if(Vf[i].rpose.arco.end<Vf[i+1].rpose.arco.end)
+            if(Vf[i].end<Vf[i+1].end)
             {
-                // Si ambos empiezan en el mismo ángulo:
-                if(Vf[i].rpose.arco.start == Vf[i+1].rpose.arco.start)
-                {
-                    Vf[i+1].rpose.arco.start = Vf[i].rpose.arco.end;
-                    Vf[i].rpose.distance = Vf[i].rpose.distance + Vf[i+1].rpose.distance;
-                    Vf[i].motivo = AMBOS;
-                    Vf[i].tipo   = Vf[i].tipo + Vf[i+1].tipo;
-                    Vf[i].salto  = Vf[i].salto + Vf[i+1].salto;
-                }
-
-                else
-                {
-                    // Creo el Arco de intersección:
-                    Vf.emplace_back(
-                        Seccion(Vf[i+1].rpose.arco.start,Vf[i].rpose.arco.end),
-                        Vf[i].rpose.distance + Vf[i+1].rpose.distance,
-                        AMBOS,
-                        Vf[i].tipo + Vf[i+1].tipo,
-                        Vf[i].salto + Vf[i+1].salto);
-                
-                    // Almaceno un ángulo para no borrarlo
-                    aux_angle = Vf[i].rpose.arco.end;
-
-                    // Modificamos el primer ángulo:
-                    Vf[i].rpose.arco.end = Vf[i+1].rpose.arco.start;
-
-                    // Modificamos el segundo arco
-                    Vf[i+1].rpose.arco.start = aux_angle;
-                }
+                Vf[i].end = Vf[i+1].end;
             }
 
-            // El segundo filtro esta completamente contenido en el primero
-            else if(Vf[i].rpose.arco.end>Vf[i+1].rpose.arco.end)
-            {
-                // Creamos el arco del final
-                Vf.emplace_back(
-                    Seccion(Vf[i+1].rpose.arco.end, Vf[i].rpose.arco.end),
-                    Vf[i].rpose.distance,
-                    Vf[i].motivo,
-                    Vf[i].tipo,
-                    Vf[i].salto);
-                
-                // Modificamos el arco del principio 
-                Vf[i].rpose.arco.end   = Vf[i+1].rpose.arco.start;
-                
-                // Modificamos el arco intermedio
-                Vf[i+1].tipo           = Vf[i+1].tipo + Vf[i].tipo;
-                Vf[i+1].motivo         = AMBOS;
-                Vf[i+1].rpose.distance = Vf[i+1].rpose.distance + Vf[i].rpose.distance;
-                Vf[i+1].salto          = Vf[i+1].salto + Vf[i].salto;
-            }
-
-            else
-            {
-                // Modificamos el ángulo del arco
-                Vf[i].rpose.arco.end  = Vf[i+1].rpose.arco.start;
-                
-                // Arco de intersección:
-                Vf[i+1].rpose.distance    = Vf[i].rpose.distance + Vf[i+1].rpose.distance;
-                Vf[i+1].motivo            = AMBOS;
-                Vf[i+1].tipo              = Vf[i].tipo  + Vf[i+1].tipo;
-                Vf[i+1].salto             = Vf[i].salto + Vf[i+1].salto;
-                
-                // Caso especial en el que ambos arcos son igguales
-                if(Vf[i].rpose.arco.start == Vf[i].rpose.arco.end)
-                    Vf.erase(Vf.begin()+i);
-            }
-            std::sort(Vf.begin()+i,Vf.end(),Compare_FiltroAngular);    
+            Vf.erase(Vf.begin()+i+1);
         }
         else i++;        
     }
 }
 
+void RelativeAngle(Seccion &f ,const pose &pr,VFiltros &vdf)
+{
+    f.start = M180(f.start - pr.theta);
+    f.end   = M180(f.end   - pr.theta);
 
-void new_filters(VFiltros &VObjRdistance,pose const &robot,const VObjetos &lfobjects ){
+    // Si al hacerlos relativos pasan desde 180
+    // a -180 hay que partirlos
+    if(f.start > f.end)                   
+    {
+        if(f.start != 180)
+        {
+            if(f.end != -180)
+            {    
+                // Si no se hace asi puede que 
+                // haya una relocalización
+                // y el puntero se eche a perder
+                float aux = f.start;
+                f.start = -180.0;
+                vdf.emplace_back(aux,180);
+            }  
+            else
+                f.end = 180;
+        }
+        else
+            f.start = -180;
+    }
+}
 
-    // Calculo los angulos que estan fuera del campo
-    if((robot.x>=0)&&(robot.y>=0))
-        DangerAngles1C(robot,VObjRdistance);
-    else if((robot.x<=0)&&(robot.y>=0))
-        DangerAngles2C(robot,VObjRdistance);
-    else if((robot.x<=0)&&(robot.y<=0))
-        DangerAngles3C(robot,VObjRdistance);        
-    else if((robot.x>=0)&&(robot.y<=0))
-        DangerAngles4C(robot,VObjRdistance);        
 
+void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
+    pose const &robot,VSearchObjects &SearchObjects)
+{    
+    if (!robot_localised)
+    {
+        // Calculo los angulos que estan fuera del campo
+        if((robot.x>=0)&&(robot.y>=0))
+            DangerAngles1C(robot,filtros);
+        else if((robot.x<=0)&&(robot.y>=0))
+            DangerAngles2C(robot,filtros);
+        else if((robot.x<=0)&&(robot.y<=0))
+            DangerAngles3C(robot,filtros);        
+        else if((robot.x>=0)&&(robot.y<=0))
+            DangerAngles4C(robot,filtros);        
+    }
     //VObjRdistance.emplace_back();
 
     // Calculo donde espero ver los objetos
-    //std::for_each(lfobjects.begin(),lfobjects.end(),[&](ObjSearchData  obj)
-    //{
-    //    ObjectsAngles(robot,obj,VObjRdistance);
-    //});
-    
-
-    // Cambio todos los ángulosa ángulos relativos:
-    for(int i=VObjRdistance.size()-1;i>=0;--i)
-        RelativeAngle(VObjRdistance[i],robot,VObjRdistance);
-
-    /* // Problema con las referencias :( la versión de arriba funciona
-    std::for_each(VObjRdistance.rbegin(),VObjRdistance.rend(),[&](FiltroAngular f)
+    std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData obj)
     {
-        std::cout<<"Hola";
-        RelativeAngle(f,robot,VObjRdistance);
-        //NewRelativeAngle(&f,robot,VObjRdistance);
+        ObjectsAngles(robot,obj,filtros);
+    });
 
-    });*/
 
-    //
-    // Ordenamos los angulos para que analizarlo 
-    // de manera ordenada desde el lidar:
-    std::sort(VObjRdistance.begin(),VObjRdistance.end(),Compare_FiltroAngular);    
-    
-    // Comprobamos que no haya filtrs que
-    // comen a otros filtros
-    DesacoploAngulos(VObjRdistance);
+    // Caso especial que se da con bastante probabilidad
+    if((filtros[0].start == -180) && (filtros[0].end == 180))
+    {
+        filtros.clear();
+        filtros.emplace_back(0,0);
+    }
+
+    else
+    {
+        // Cambio todos los ángulosa ángulos relativos:
+        for(int i =SearchObjects.size()-1;i >= 0;--i)
+            RelativeAngle(filtros[i],robot,filtros);        
+        // Ordenamos los angulos para que analizarlo de manera ordenada desde el lidar:
+        std::sort(filtros.begin(),filtros.end(),GenerarAcoples);    
+
+        // Si un ángulo se come a otro los juntamos 
+        AcoploAngulos(filtros);
+    }
 }

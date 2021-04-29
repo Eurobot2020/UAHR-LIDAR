@@ -1,7 +1,7 @@
 #pragma once
 #include "uahr_types.hpp"
 
-bool Compare_FiltroAngular(FiltroAngular a1, FiltroAngular a2);
+bool GenerarAcoples(Seccion a1, Seccion a2);
 
 inline bool InLimits(float target,float lowerlimit, float upperlimit)
 {
