@@ -65,20 +65,23 @@ def cb_enemy_robots(msg):
                 pose.x + msg.array[i].dist * math.cos(math.radians(msg.array[i].angle + pose.theta)))
             disty = (
                 pose.y + msg.array[i].dist * math.sin(math.radians(msg.array[i].angle + pose.theta)))
-            all_enemies.markers[i].action = 0
-            all_enemies.markers[i].text = "Enemy robot"
-
-            all_enemies.markers[i].points = [Point(
-                pose.x / SF,
-                pose.y / SF,
-                0),
-                Point(distx/SF, disty/SF, 0)]
-            all_enemies.markers[i].action = 0
+            if(abs(distx) <1500 and abs(disty) < 1000):
+            
+                all_enemies.markers[i].action = 0
+                all_enemies.markers[i].points = [Point(
+                    pose.x / SF,
+                    pose.y / SF,
+                    0),
+                    Point(distx/SF, disty/SF, 0)]
+                all_enemies.markers[i].action = 0
+                #print(i)
+            else:
+                all_enemies.markers[i].action = 2
         else:
             all_enemies.markers[i].action = 2
 
     pub_recognized_robots.publish(all_enemies)
-
+    #print("pub_enemies")
 
 if __name__ == "__main__":
     rospy.init_node("display_lidar")
@@ -112,7 +115,7 @@ if __name__ == "__main__":
     robot_marker = new_cube(SF, "robot", pose, size(144, 300, 350), 'b')
 
     enemy_line_list = []
-    for i in range(10):
+    for i in range(20):
         enemy_line_list.append('LE'+str(i))
         i += 1
 
