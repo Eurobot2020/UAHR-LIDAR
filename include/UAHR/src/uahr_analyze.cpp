@@ -122,18 +122,18 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
                 uahr_msgs::PolarArray  &Vpubposes,  
                 uahr_msgs::PolarArray  &Vpubrobots)
 {
-    //Filtro por forma
-
+    // Hago cluster de puntos:
     RPLidarScanToCluster(nodes,node_count,angle_max, angle_increment,
                 Vclusters,Vfiltros,max_distance);
     
 
 
+    
     /*
+    // Filtro por tamaño
     VVPolars Vclusters2;
     Vclusters2.reserve(Vclusters.size());
-    
-    
+
     std::copy_if(Vclusters.begin(),Vclusters.end(),std::back_inserter(Vclusters2),[&](VPolars  cluster)
     {
         if (((cluster.back().dist>1200) && (cluster.size()<4))
@@ -151,7 +151,7 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
     });*/
 
     /*
-    // Hago la media de los clusters
+    // Publica todo 
     for (auto & cluster : Vclusters)
     {
         std::cout<<"Size "<<cluster.size()<<std::endl;
@@ -159,50 +159,56 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
         Vpubrobots.array.emplace_back(polar);
         std::cout<<"Angulo "<<polar.angle<<" Distancia "<<polar.dist<<std::endl;   
     }*/
+
+    // Hago la media de los cluster sobrantes:
     VPolars medidas_cluster;
-    VPolars aux_cluster;
+    medidas_cluster.reserve(Vclusters.size());
     for (VPolars & cluster : Vclusters)
     {
         medidas_cluster.emplace_back(MeanCluster(cluster));
     }
 
-    /*
-    std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData obj)
+
+    VPolars aux_cluster;
+    std::vector<int> n;
+    if(medidas_cluster.size())
     {
-        std::copy_if(medidas_cluster.begin(),medidas_cluster.end(),
-            std::back_inserter(aux_cluster),[&](polar rp)
+        // Asocia cada cluster con un objeto:
+        std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData obj)
+        {
+            float difference;
+            float difference_min = 1000;
+            int index=-1;
+
+            for(int j=0; j<medidas_cluster.size();j++)
             {
-                if((InLimits(rp.dist,obj.rpose.dist-50,obj.rpose.dist+50))
-                    &&
-                    (InLimits(rp.angle,obj.rpose.angle-10,obj.rpose.angle+10)))
-                    return true;
-                else
-                    return false;
-
-            });
-        if (aux_cluster.size())
-            {
-                if (aux_cluster.size()==1)
+                if((InLimits(medidas_cluster[j].dist,obj.rpose.dist-300,obj.rpose.dist+300))
+                &&
+                (InLimits(medidas_cluster[j].angle,obj.rpose.angle-10,obj.rpose.angle+10)))
                 {
-                    Vpubposes.array[obj.id].angle = aux_cluster[0].angle;
-                    Vpubposes.array[obj.id].dist  = aux_cluster[0].dist;
-                    //medidas_cluster.erase(rp);
+                    difference = abs((medidas_cluster[j].angle - obj.rpose.angle) * 
+                                    (medidas_cluster[j].dist - obj.rpose.dist));
+                    n.push_back(j);
+                    if(difference<difference_min)
+                    {
+                        difference_min = difference;
+                        index = j;
+                    }
                 }
-
-                else
-                {
-                    std::cout<<"TODO TWO NEAR CLUSTERS"<<std::endl;
-                }
-
             }
-        else
-        {   
-            Vpubposes.array[obj.id].angle = 0;
-            Vpubposes.array[obj.id].dist = 0;
-        }
-        aux_cluster.clear();
-    });*/
-
+            if(index != -1)
+            {
+                Vpubposes.array[obj.id].angle = medidas_cluster[index].angle;
+                Vpubposes.array[obj.id].dist = medidas_cluster[index].dist;
+                for(int a=n.size()-1;a>=0;--a)
+                    medidas_cluster.erase(medidas_cluster.begin()+a);
+            }
+            else
+            {
+                Vpubposes.array[obj.id].angle = 0;
+                Vpubposes.array[obj.id].dist = 0;
+            }
+    });
     uahr_msgs::Polar aux_polar;
     for (auto & cluster : medidas_cluster)
     {
@@ -210,8 +216,52 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
         aux_polar.dist  = cluster.dist;
         Vpubrobots.array.emplace_back(aux_polar);
     }
-
-
-
-    
+    }
 }
+
+    //    std::copy_if(medidas_cluster.begin(),medidas_cluster.end(),
+    //        std::back_inserter(aux_cluster),[&](polar rp)
+    //        {
+    //            //std::cout<<"Cluster repecto a objeto dist: "<<rp.dist - obj.rpose.dist <<" angulo"<<rp.angle- obj.rpose.angle<<std::endl;
+    //            //std::cout<<"Cluster dist: "<<rp.dist <<" angulo: "<<rp.angle<<std::endl;
+    //            //std::cout<<"objeto dist: "<<obj.rpose.dist <<" angulo"<<obj.rpose.angle<<std::endl;
+//
+//
+//            if((InLimits(rp.dist,obj.rpose.dist-200,obj.rpose.dist+200))
+//                &&
+//                (InLimits(rp.angle,obj.rpose.angle-10,obj.rpose.angle+10)))
+//               
+//                return true;
+//            
+//            else
+//                return false;
+//
+    //        });
+    //    if (aux_cluster.size())
+    //    {
+    //        if (aux_cluster.size()==1)
+    //        {
+    //            Vpubposes.array[obj.id].angle = aux_cluster[0].angle;
+    //            Vpubposes.array[obj.id].dist  = aux_cluster[0].dist;
+    //            //medidas_cluster.erase(rp);
+    //            std::cout<<"1 NEAR CLUSTERS"<<obj.id<<std::endl;
+    //        
+    //        }
+
+//            else
+//            {
+//                std::cout<<"TODO TWO NEAR CLUSTERS "<<aux_cluster.size()<<std::endl;
+//                Vpubposes.array[obj.id].angle = 0;
+//                Vpubposes.array[obj.id].dist = 0;
+//                
+//            }
+//
+//        }
+//        else
+//        {   
+//            Vpubposes.array[obj.id].angle = 0;
+//            Vpubposes.array[obj.id].dist = 0;
+//        }
+//        aux_cluster.clear();
+//    });
+

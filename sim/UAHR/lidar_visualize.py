@@ -112,7 +112,7 @@ if __name__ == "__main__":
     robot_marker = new_cube(SF, "robot", pose, size(144, 300, 350), 'b')
 
     enemy_line_list = []
-    for i in range(400):
+    for i in range(10):
         enemy_line_list.append('LE'+str(i))
         i += 1
 

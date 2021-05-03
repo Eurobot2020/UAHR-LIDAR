@@ -235,7 +235,7 @@ int main(int argc, char * argv[])
         // TODO QUITAR ESTO Y HACER ALGO BUENO CON LOS YAMLS
         for(int j=0; j<=6; j=j+2)
         {
-            lfobjects.push_back(ObjSearchData{ejemplos_list[j],ejemplos_list[j+1],j});
+            lfobjects.push_back(ObjSearchData{ejemplos_list[j],ejemplos_list[j+1],j/2});
             
         }
         

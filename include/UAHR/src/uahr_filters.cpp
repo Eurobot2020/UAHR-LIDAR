@@ -180,7 +180,6 @@ void ObjectsAngles(const pose &p_obs,ObjSearchData &pasive_obj,VFiltros &vf)
     ao  = M180(RAD2DEG(atan2(dy,dx)));
     pasive_obj.rpose.angle = ao;
     pasive_obj.rpose.dist = sqrt(dx*dx+dy*dy);
-
     // Intento construir el elemento directamente,
     // en el heap
     vf.emplace_back(ao-FA,ao+FA);
@@ -258,10 +257,16 @@ void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
     //VObjRdistance.emplace_back();
 
     // Calculo donde espero ver los objetos
-    std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData obj)
+    /*std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData obj)
     {
         ObjectsAngles(robot,obj,filtros);
-    });
+    });*/
+
+    for(auto & obj: SearchObjects)
+    {
+        ObjectsAngles(robot,obj,filtros);
+    }
+
 
 
     // Caso especial que se da con bastante probabilidad

@@ -43,8 +43,14 @@ LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p)
 
     this->Vpubrobots.array.reserve(10);
     this->Vpubtriangulate.array.reserve(ObjetosBusqueda.size());
+    uahr_msgs::Polar aux;
+
+    for(int i = 0; i<ObjetosBusqueda.size();i++)
+    {
+        Vpubtriangulate.array.push_back(aux);
+    }
     this->robot_localised = false;
-    
+    std::fill(Vpubtriangulate.array.begin(),Vpubtriangulate.array.end(),aux);
     // Cálculamos los nuevos filtros
     UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);
     prompt_filters();
@@ -58,18 +64,23 @@ void LidarHandler::cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
     this->robot.theta = msg->theta; 
     // Calculamos los nuevos filtros:
     UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);
+    
 }
 
 void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count, 
     const float &angle_max, const float &angle_increment)
 {
+    uahr_msgs::Polar aux;
+    
     // Limpio los vectores:
-    this->Vpubtriangulate.array.clear(),
+    std::fill(Vpubtriangulate.array.begin(),Vpubtriangulate.array.end(),aux);
+//    this->Vpubtriangulate.array.clear(),
+
+
     this->Vpubrobots.array.clear();
 
     // Actualizo la posición del robot:
     Seccion max_distance_enemies(100,3300);
-    
 
     // Calculamos los nuevos filtros:
     AnalyzeScan(nodes, node_count,
@@ -82,7 +93,7 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
         this->Vpubtriangulate,
         this->Vpubrobots);
     
-    //prompt_scans();
+   // prompt_scans();
 }
 
 void LidarHandler::prompt_filters()
