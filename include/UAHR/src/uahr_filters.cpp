@@ -210,6 +210,9 @@ void AcoploAngulos(VFiltros &Vf)
     }
 }
 
+
+
+
 void RelativeAngle(Seccion &f ,const pose &pr,VFiltros &vdf)
 {
     f.start = M180(f.start - pr.theta);
@@ -287,4 +290,33 @@ void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
         // Si un ángulo se come a otro los juntamos 
         AcoploAngulos(filtros);
     }
+}
+
+float biggest_distance_corner(pose robot)
+{
+    pose opposite_corner;
+    if((robot.x>=0)&&(robot.y>=0))
+    {
+        opposite_corner.x = -LIMX;
+        opposite_corner.y = -LIMY;
+    }
+    else if((robot.x<=0)&&(robot.y>=0))
+    {
+        opposite_corner.x = LIMX;
+        opposite_corner.y = -LIMY;
+    }
+    else if((robot.x<=0)&&(robot.y<=0))
+    {
+        opposite_corner.x = LIMX;
+        opposite_corner.y = LIMY;
+    }
+
+    else if((robot.x>=0)&&(robot.y<=0))
+    {
+        opposite_corner.x = -LIMX;
+        opposite_corner.y = LIMY;
+    }
+    return (sqrt((robot.x - opposite_corner.x)*(robot.x - opposite_corner.x) 
+    + (robot.y - opposite_corner.y) * (robot.y - opposite_corner.y))+300);
+
 }

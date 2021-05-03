@@ -3,7 +3,7 @@
 #include "uahr_filters.hpp"
 #include "uahr_types.hpp"
 #include "uahr_common.hpp"
-
+#define MIN_DIST_ROBOT 100
 
 
 class LidarHandler
@@ -82,15 +82,19 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
     this->Vpubrobots.array.clear();
     this->Vclusters.clear();
 
-    // Actualizo la posición del robot:
-    Seccion max_distance_enemies(100,3100);
+   
+    Seccion search_distance;
+    search_distance.start = MIN_DIST_ROBOT;
+    search_distance.end = biggest_distance_corner(this->robot);
+
+    
 
     // Calculamos los nuevos filtros:
     AnalyzeScan(nodes, node_count,
         angle_max, 
         angle_increment,
         this->SectionsFilters,
-        max_distance_enemies,
+        search_distance,
         this->TriangulateObjects,
         this->Vclusters,
         this->Vpubtriangulate,

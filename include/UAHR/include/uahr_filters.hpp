@@ -15,3 +15,5 @@ void RelativeAngle(Seccion &f ,const pose &pr,VFiltros &vdf);
 void AcoploAngulos(VFiltros &Vf);
 void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
     pose const &robot,VSearchObjects &SearchObjects);
+float biggest_distance_corner(pose robot);
+
