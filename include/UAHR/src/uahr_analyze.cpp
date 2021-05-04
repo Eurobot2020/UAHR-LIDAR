@@ -85,7 +85,7 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
 
     for(int j=0; j<Vclusters.size();j++)
     {
-        if((InLimits(Vclusters[j].dist,obj.rpose.dist-300,obj.rpose.dist+300))
+        if((InLimits(Vclusters[j].dist,obj.rpose.dist-100,obj.rpose.dist+100))
             &&
             (InLimits(Vclusters[j].angle, obj.rpose.angle-10,obj.rpose.angle+10)))
         {
@@ -107,7 +107,7 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
         p.angle = Vclusters[index].angle;
 
         for(int a=n.size()-1;a>=0;--a)
-            Vclusters.erase(Vclusters.begin()+a);
+            Vclusters.erase(Vclusters.begin()+n[a]);
     }
     return p;
 }
@@ -192,8 +192,8 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
     medidas_cluster.reserve(Vclusters.size());
     for (VPolars & cluster : Vclusters)
     {
-        if(cluster.size()>1)
-            medidas_cluster.emplace_back(MeanCluster(cluster));
+        //if(cluster.size()>1)
+        medidas_cluster.emplace_back(MeanCluster(cluster));
     }
 
     if(medidas_cluster.size())

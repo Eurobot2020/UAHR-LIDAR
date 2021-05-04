@@ -13,7 +13,7 @@
 #define OBJETO  'O'
 #define ROBOT   'R'
 #define AMBOS   'A'
-#define FA       3
+#define FA       10
 #define FD       0.1  
 // Estructuras
 struct polar 
