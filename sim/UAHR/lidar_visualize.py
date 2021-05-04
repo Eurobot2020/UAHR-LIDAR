@@ -65,18 +65,18 @@ def cb_enemy_robots(msg):
                 pose.x + msg.array[i].dist * math.cos(math.radians(msg.array[i].angle + pose.theta)))
             disty = (
                 pose.y + msg.array[i].dist * math.sin(math.radians(msg.array[i].angle + pose.theta)))
-            if(abs(distx) <1500 and abs(disty) < 1000):
+            #if(abs(distx) <1500 and abs(disty) < 1000):
             
-                all_enemies.markers[i].action = 0
-                all_enemies.markers[i].points = [Point(
-                    pose.x / SF,
-                    pose.y / SF,
-                    0),
-                    Point(distx/SF, disty/SF, 0)]
-                all_enemies.markers[i].action = 0
+            all_enemies.markers[i].action = 0
+            all_enemies.markers[i].points = [Point(
+                pose.x / SF,
+                pose.y / SF,
+                0),
+                Point(distx/SF, disty/SF, 0)]
+            all_enemies.markers[i].action = 0
                 #print(i)
-            else:
-                all_enemies.markers[i].action = 2
+            #else:
+            #    all_enemies.markers[i].action = 2
         else:
             all_enemies.markers[i].action = 2
 

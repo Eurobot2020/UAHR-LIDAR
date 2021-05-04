@@ -79,24 +79,50 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
 {
     uahr_msgs::Polar p;
     float difference;
-    float difference_min = 3100;
+    float difference_min = 31000;
     int   index=-1;
     std::vector<int> n;
 
-    for(int j=0; j<Vclusters.size();j++)
+    if(abs(obj.rpose.angle) >= 170)
     {
-        if((InLimits(Vclusters[j].dist,obj.rpose.dist-100,obj.rpose.dist+100))
-            &&
-            (InLimits(Vclusters[j].angle, obj.rpose.angle-10,obj.rpose.angle+10)))
+        float dist_ang = 0;
+        for(int j=0; j<Vclusters.size();j++)
         {
-            // TODO: Es esto una buena forma de medir?
-            difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
-                             (Vclusters[j].dist - obj.rpose.dist));
-            n.push_back(j);
-            if(difference<difference_min)
+            dist_ang = abs(Vclusters[j].angle) - abs(obj.rpose.angle);
+            if((InLimits(Vclusters[j].dist,obj.rpose.dist-100,obj.rpose.dist+100))
+                &&
+                (InLimits(dist_ang, -10, +10)))
             {
-                difference_min = difference;
-                index = j;
+                // TODO: Es esto una buena forma de medir?
+                difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
+                                (Vclusters[j].dist - obj.rpose.dist));
+                n.push_back(j);
+                if(difference<difference_min)
+                {
+                    difference_min = difference;
+                    index = j;
+                }
+            }
+        }
+    }
+
+    else
+    {
+        for(int j=0; j<Vclusters.size();j++)
+        {
+            if((InLimits(Vclusters[j].dist,obj.rpose.dist-100,obj.rpose.dist+100))
+                &&
+                (InLimits(Vclusters[j].angle, obj.rpose.angle-10,obj.rpose.angle+10)))
+            {
+                // TODO: Es esto una buena forma de medir?
+                difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
+                                (Vclusters[j].dist - obj.rpose.dist));
+                n.push_back(j);
+                if(difference<difference_min)
+                {
+                    difference_min = difference;
+                    index = j;
+                }
             }
         }
     }
@@ -105,7 +131,8 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
     {
         p.dist = Vclusters[index].dist;
         p.angle = Vclusters[index].angle;
-
+        obj.rpose.dist  = p.dist;
+        obj.rpose.angle = p.angle;
         for(int a=n.size()-1;a>=0;--a)
             Vclusters.erase(Vclusters.begin()+n[a]);
     }

@@ -56,5 +56,5 @@ install(DIRECTORY launch rviz sdk
   USE_SOURCE_PERMISSIONS
 )
 
-catkin_add_gtest(lidarlibtest test/LidarLib.cpp ${UAHR_SRC})
-target_link_libraries(lidarlibtest ${catkin_LIBRARIES})
+catkin_add_gtest(filter_test test/test_uahr_filters.cpp ${UAHR_SRC})
+target_link_libraries(filter_test ${catkin_LIBRARIES})

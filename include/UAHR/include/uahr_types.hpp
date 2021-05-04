@@ -13,7 +13,7 @@
 #define OBJETO  'O'
 #define ROBOT   'R'
 #define AMBOS   'A'
-#define FA       10
+#define FA       5
 #define FD       0.1  
 // Estructuras
 struct polar 
@@ -24,9 +24,6 @@ struct polar
     angle{_angle},dist{_dist}{}
 
 };
-
-
-
 
 
 struct pose

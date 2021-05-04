@@ -68,8 +68,8 @@ void LidarHandler::cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
     this->robot.y = msg->y;
     this->robot.theta = msg->theta; 
     // Calculamos los nuevos filtros:
-    UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);
-    
+    UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);    
+    prompt_filters();
 }
 
 void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count, 
@@ -100,6 +100,7 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
         this->Vpubtriangulate,
         this->Vpubrobots);
     //prompt_scans();
+    //prompt_filters();
 }
 
 void LidarHandler::prompt_filters()
@@ -108,6 +109,13 @@ void LidarHandler::prompt_filters()
     {
         std::cout<<"Angle Start "<<filtro.start<<" Angle End "<<filtro.end<<std::endl;
     }
+
+    for (auto & objeto : TriangulateObjects)
+    {
+        std::cout<<"Objeto ID: "<<objeto.id<<" Angle "<< objeto.rpose.angle <<" Dist "<<objeto.rpose.dist<<std::endl;
+    }
+    
+
 }
 
 void LidarHandler::prompt_scans()

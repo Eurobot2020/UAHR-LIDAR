@@ -196,7 +196,7 @@ void AcoploAngulos(VFiltros &Vf)
     while(i<Vf.size()-1)
     {
         // Existe acoplamiento entre dos angulos de interes?
-        if(Vf[i+1].start<Vf[i].end)
+        if(Vf[i+1].start<=Vf[i].end)
         {
             // El primer filtro solo contiene parte del segundo filtro
             if(Vf[i].end<Vf[i+1].end)
@@ -215,29 +215,33 @@ void AcoploAngulos(VFiltros &Vf)
 
 void RelativeAngle(Seccion &f ,const pose &pr,VFiltros &vdf)
 {
-    f.start = M180(f.start - pr.theta);
-    f.end   = M180(f.end   - pr.theta);
-
-    // Si al hacerlos relativos pasan desde 180
-    // a -180 hay que partirlos
-    if(f.start > f.end)                   
+    if((f.start !=-180) && (f.end != 180))
     {
-        if(f.start != 180)
+    
+        f.start = M180(f.start - pr.theta);
+        f.end   = M180(f.end   - pr.theta);
+
+        // Si al hacerlos relativos pasan desde 180
+        // a -180 hay que partirlos
+        if(f.start > f.end)                   
         {
-            if(f.end != -180)
-            {    
-                // Si no se hace asi puede que 
-                // haya una relocalización
-                // y el puntero se eche a perder
-                float aux = f.start;
-                f.start = -180.0;
-                vdf.emplace_back(aux,180);
-            }  
+            if(f.start != 180)
+            {
+                if(f.end != -180)
+                {    
+                    // Si no se hace asi puede que 
+                    // haya una relocalización
+                    // y el puntero se eche a perder
+                    float aux = f.start;
+                    f.start = -180.0;
+                    vdf.emplace_back(aux,180);
+                }  
+                else
+                    f.end = 180;
+            }
             else
-                f.end = 180;
+                f.start = -180;
         }
-        else
-            f.start = -180;
     }
 }
 
@@ -245,6 +249,7 @@ void RelativeAngle(Seccion &f ,const pose &pr,VFiltros &vdf)
 void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
     pose const &robot,VSearchObjects &SearchObjects)
 {    
+    filtros.clear();
     if (!robot_localised)
     {
         // Calculo los angulos que estan fuera del campo
