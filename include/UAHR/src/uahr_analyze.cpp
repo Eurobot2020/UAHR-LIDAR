@@ -231,15 +231,26 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
     if(medidas_cluster.size())
     {
         uahr_msgs::Polar aux_polar;
+        float adiff;
+        float ddiff;
+
         // Asocia la distancia de cada cluster con un objeto:
         std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData & obj)
         {
             aux_polar = AssingClustertoObject(obj,medidas_cluster);
+            ddiff = abs(aux_polar.dist - Vpubposes.array[obj.id].dist);
+            adiff = abs(aux_polar.angle - Vpubposes.array[obj.id].angle);
+
+
             if(obj.tracked)
             {
-                if(!(((aux_polar.angle - Vpubposes.array[obj.id].angle) < 3) 
-                    && ((aux_polar.dist - Vpubposes.array[obj.id].dist) < 7)))
+                // Lo mas importante es el ángulo
+                if(!(((adiff <3) || (adiff>177))  && ddiff<30))
+                {
+                    std::cout<<"La diferencia angular "<<adiff<<" la de distancia "<<ddiff<<std::endl;
                     Vpubposes.array[obj.id] = aux_polar;
+                }
+    
             }
             
             // Filtro ruido:

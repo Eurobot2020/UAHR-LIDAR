@@ -178,7 +178,7 @@ void ObjectsAngles(const pose &p_obs,ObjSearchData &pasive_obj,VFiltros &vf)
     dx = pasive_obj.x - p_obs.x;
     dy = pasive_obj.y - p_obs.y;
     ao  = M180(RAD2DEG(atan2(dy,dx)));
-    pasive_obj.theoric_rpose.angle = ao;
+    pasive_obj.theoric_rpose.angle = M180(ao - p_obs.theta);
     pasive_obj.theoric_rpose.dist = sqrt(dx*dx+dy*dy);
     // Intento construir el elemento directamente,
     // en el heap
