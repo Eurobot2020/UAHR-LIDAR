@@ -56,7 +56,6 @@ void publish_scan(ros::Publisher *pub_robots,
     int   cluster = 0;
     float aux;
     static int flag= 0;
-    uahr_msgs::PolarArray VPA;
 
 
     if (reversed) {
@@ -87,30 +86,6 @@ void publish_scan(ros::Publisher *pub_robots,
     }
 }
 
-
-/*    
-    pub_robots->publish(VPA);
-    VPA.array.clear();
-    
-    // OJO QUE ESTO SE HA CAMBIADO
-    for(int i=0; i<4;i++)
-    {
-        if(pose_objeto[i][0]!= 0)
-        {
-            robot_cluster.dist  = pose_objeto[i][1]/pose_objeto[i][0];
-            robot_cluster.angle = pose_objeto[i][2]/pose_objeto[i][0];
-            VPA.array.push_back(robot_cluster);
-            //ROS_INFO("veo %d en %f a una distancia de %f",i,robot_cluster.dist,robot_cluster.angle);
-        }
-        else
-        {
-            robot_cluster.dist  = 0;
-            robot_cluster.angle = 0;
-            VPA.array.push_back(robot_cluster);
-        }
-    }
-    pub_objects->publish(VPA);
-    */           
 
 bool getRPLIDARDeviceInfo(RPlidarDriver * drv)
 {
@@ -198,14 +173,17 @@ int main(int argc, char * argv[])
     std::string name_y;
     std::string name_a;
     std::string name_objs;
+    std::string modo;
+    std::string name_zero;
+
     int fil_angular[4] {FA+10,FA+10,FA/2,FA};
     std::vector<ObjSearchData> lfobjects;
 
-    std::string modo;
     std::vector<int> ejemplos_list;
     int px;
     int py;
     int ptheta;
+    int zero;
 
     struct pose robot;
     ros::Subscriber sub_pose;
@@ -220,13 +198,16 @@ int main(int argc, char * argv[])
         &&
         nh.searchParam("objetos_busqueda_sucio",name_objs)
         &&
-        nh.searchParam("modo",name_m))
+        nh.searchParam("modo",name_m)
+        &&
+        nh.searchParam("angle_zero_lidar_front",name_zero))
     {
         nh.getParam(name_x, px);
         nh.getParam(name_y, py);
         nh.getParam(name_a, ptheta);
         nh.getParam(name_m, modo);
         nh.getParam(name_objs,ejemplos_list);
+        nh.getParam(name_zero,zero);
             
         robot.x = px;
         robot.y = py;
@@ -236,7 +217,6 @@ int main(int argc, char * argv[])
         for(int j=0; j<=6; j=j+2)
         {
             lfobjects.push_back(ObjSearchData{ejemplos_list[j],ejemplos_list[j+1],j/2});
-            
         }
         
     }
@@ -247,7 +227,7 @@ int main(int argc, char * argv[])
         ros::shutdown();
     }
 
-    class LidarHandler Handler(lfobjects,robot);
+    class LidarHandler Handler(lfobjects,robot,zero);
     sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
 
     // Eurobot publishers:

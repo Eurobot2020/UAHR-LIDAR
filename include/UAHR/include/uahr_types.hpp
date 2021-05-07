@@ -13,7 +13,7 @@
 #define OBJETO  'O'
 #define ROBOT   'R'
 #define AMBOS   'A'
-#define FA       5
+#define FA       15
 #define FD       0.1  
 // Estructuras
 struct polar 
@@ -60,9 +60,11 @@ struct ObjSearchData
     const int y;
     const int id;
     polar rpose;
+    polar theoric_rpose;
+    bool  tracked;
 
     ObjSearchData(int _x,int _y, int _id): 
-    x{_x}, y{_y},id{_id},rpose(0,0){}
+    x{_x}, y{_y},id{_id},rpose(0,0),theoric_rpose(0,0),tracked(false){}
 };
 
 using VPolars  = std::vector<polar>;

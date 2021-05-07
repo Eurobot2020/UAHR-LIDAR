@@ -19,7 +19,6 @@ void StoreScan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
 }
 
 
-
 void RPLidarScanToCluster(rplidar_response_measurement_node_hq_t *nodes,size_t node_count,
         const float &angle_max, const float &angle_increment, VVPolars &Vclusters,
         VFiltros &Vfiltros,Seccion distance_limits)
@@ -80,7 +79,8 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
     uahr_msgs::Polar p;
     float difference;
     float difference_min = 31000;
-    int   index=-1;
+    int   index = -1;
+    bool  in_the_midle = false;
     std::vector<int> n;
 
     if(abs(obj.rpose.angle) >= 170)
@@ -89,9 +89,9 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
         for(int j=0; j<Vclusters.size();j++)
         {
             dist_ang = abs(Vclusters[j].angle) - abs(obj.rpose.angle);
-            if((InLimits(Vclusters[j].dist,obj.rpose.dist-100,obj.rpose.dist+100))
+            if((InLimits(Vclusters[j].dist,obj.rpose.dist-50,obj.rpose.dist+50))
                 &&
-                (InLimits(dist_ang, -10, +10)))
+                (InLimits(dist_ang, -10, 10)))
             {
                 // TODO: Es esto una buena forma de medir?
                 difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
@@ -110,31 +110,72 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
     {
         for(int j=0; j<Vclusters.size();j++)
         {
-            if((InLimits(Vclusters[j].dist,obj.rpose.dist-100,obj.rpose.dist+100))
-                &&
-                (InLimits(Vclusters[j].angle, obj.rpose.angle-10,obj.rpose.angle+10)))
+            if(obj.tracked)
             {
-                // TODO: Es esto una buena forma de medir?
-                difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
-                                (Vclusters[j].dist - obj.rpose.dist));
-                n.push_back(j);
-                if(difference<difference_min)
-                {
-                    difference_min = difference;
-                    index = j;
+                if((InLimits(Vclusters[j].angle, obj.rpose.angle-5,obj.rpose.angle+5)
+                    &&
+                    Vclusters[j].dist < obj.rpose.dist+50))
+                {    
+                    in_the_midle = true;
+                    if( Vclusters[j].dist > obj.rpose.dist -50)
+                    {
+                        // TODO: Es esto una buena forma de medir?
+                        difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
+                                        (Vclusters[j].dist - obj.rpose.dist));
+                        n.push_back(j);
+                        if(difference<difference_min)
+                        {
+                            difference_min = difference;
+                            index = j;
+                        }
+                    }
                 }
             }
+            else
+            {
+                if((InLimits(Vclusters[j].angle, obj.rpose.angle-10,obj.rpose.angle+10)
+                &&
+                Vclusters[j].dist < obj.rpose.dist+100))
+                {    
+                    in_the_midle = true;
+                    if( Vclusters[j].dist > obj.rpose.dist -100)
+                    {
+                        // TODO: Es esto una buena forma de medir?
+                        difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
+                                        (Vclusters[j].dist - obj.rpose.dist));
+                        n.push_back(j);
+                        if(difference<difference_min)
+                        {
+                            difference_min = difference;
+                            index = j;
+                        }
+                    }
+                }
+
+            }
+            
         }
     }
     
     if(index != -1)
     {
+        obj.tracked = true;
         p.dist = Vclusters[index].dist;
         p.angle = Vclusters[index].angle;
         obj.rpose.dist  = p.dist;
         obj.rpose.angle = p.angle;
+        // Filtro clusters proximos:
         for(int a=n.size()-1;a>=0;--a)
             Vclusters.erase(Vclusters.begin()+n[a]);
+    }
+    else
+    {
+        obj.tracked = false;
+        if(!in_the_midle)
+        {
+            obj.rpose.dist  = obj.theoric_rpose.dist;
+            obj.rpose.angle = obj.theoric_rpose.angle;
+        }
     }
     return p;
 }
@@ -170,8 +211,8 @@ polar MeanCluster(VPolars cluster)
 
 void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
                 const float &angle_max, const float &angle_increment,
-                VFiltros & Vfiltros, Seccion max_distance,
-                VSearchObjects SearchObjects, VVPolars &Vclusters, 
+                VFiltros & Vfiltros, const Seccion max_distance,
+                VSearchObjects & SearchObjects, VVPolars &Vclusters, 
                 uahr_msgs::PolarArray  &Vpubposes,  
                 uahr_msgs::PolarArray  &Vpubrobots)
 {
@@ -179,47 +220,11 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
     RPLidarScanToCluster(nodes,node_count,angle_max, angle_increment,
                 Vclusters,Vfiltros,max_distance);
     
-
-
-    
-    /*
-    // Filtro por tamaño
-    VVPolars Vclusters2;
-    Vclusters2.reserve(Vclusters.size());
-
-    std::copy_if(Vclusters.begin(),Vclusters.end(),std::back_inserter(Vclusters2),[&](VPolars  cluster)
-    {
-        if (((cluster.back().dist>1200) && (cluster.size()<4))
-        ||
-        ((cluster.back().dist>800) && (cluster.size()<6))
-        ||
-        ((cluster.back().dist<=800) && (cluster.size()<20)))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    });*/
-
-    /*
-    // Publica todo 
-    for (auto & cluster : Vclusters)
-    {
-        std::cout<<"Size "<<cluster.size()<<std::endl;
-        uahr_msgs::Polar polar = MeanCluster(cluster);
-        Vpubrobots.array.emplace_back(polar);
-        std::cout<<"Angulo "<<polar.angle<<" Distancia "<<polar.dist<<std::endl;   
-    }*/
-
     // Hago la media de los cluster sobrantes:
-    
     VPolars medidas_cluster;
     medidas_cluster.reserve(Vclusters.size());
     for (VPolars & cluster : Vclusters)
     {
-        //if(cluster.size()>1)
         medidas_cluster.emplace_back(MeanCluster(cluster));
     }
 
@@ -227,10 +232,21 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
     {
         uahr_msgs::Polar aux_polar;
         // Asocia la distancia de cada cluster con un objeto:
-        std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData obj)
+        std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData & obj)
         {
             aux_polar = AssingClustertoObject(obj,medidas_cluster);
-            Vpubposes.array[obj.id] = aux_polar;
+            if(obj.tracked)
+            {
+                if(!(((aux_polar.angle - Vpubposes.array[obj.id].angle) < 3) 
+                    && ((aux_polar.dist - Vpubposes.array[obj.id].dist) < 7)))
+                    Vpubposes.array[obj.id] = aux_polar;
+            }
+            
+            // Filtro ruido:
+            else
+            {
+                Vpubposes.array[obj.id] = aux_polar;                
+            }
         });
         
         for (auto & cluster : medidas_cluster)

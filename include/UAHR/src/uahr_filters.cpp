@@ -178,8 +178,8 @@ void ObjectsAngles(const pose &p_obs,ObjSearchData &pasive_obj,VFiltros &vf)
     dx = pasive_obj.x - p_obs.x;
     dy = pasive_obj.y - p_obs.y;
     ao  = M180(RAD2DEG(atan2(dy,dx)));
-    pasive_obj.rpose.angle = ao;
-    pasive_obj.rpose.dist = sqrt(dx*dx+dy*dy);
+    pasive_obj.theoric_rpose.angle = ao;
+    pasive_obj.theoric_rpose.dist = sqrt(dx*dx+dy*dy);
     // Intento construir el elemento directamente,
     // en el heap
     vf.emplace_back(ao-FA,ao+FA);
@@ -262,6 +262,7 @@ void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
         else if((robot.x>=0)&&(robot.y<=0))
             DangerAngles4C(robot,filtros);        
     }
+    //filtros.emplace_back(-180,180);
     //VObjRdistance.emplace_back();
 
     // Calculo donde espero ver los objetos
@@ -281,7 +282,7 @@ void UpdateFilters(const bool & robot_localised,VFiltros &filtros,
     if((filtros[0].start == -180) && (filtros[0].end == 180))
     {
         filtros.clear();
-        filtros.emplace_back(0,0);
+        filtros.emplace_back(-180,180);
     }
 
     else

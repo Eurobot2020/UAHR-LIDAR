@@ -9,8 +9,10 @@
         <param name="angle_compensate"    type="bool"   value="true"/>
     </node>
     <param name="pose_x"              type="int"    value="1366"/>
-    <param name="pose_y"              type="int"    value="-16"/>
-    <param name="pose_alfa"           type="int"    value="355"/>
+    <param name="pose_y"              type="int"    value="160"/>
+    <param name="pose_alfa"           type="int"    value="180"/>
+    <param name="angle_zero_lidar_front"    type="int"   value="180"/>
+
     <rosparam command="load"          file="$(find uahr_lidar)/config/yamls/coordenadas_amarillo.yaml" />
     <param name="modo"                type="string"     value="demo"/>
 

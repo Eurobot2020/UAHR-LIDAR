@@ -10,13 +10,14 @@ class LidarHandler
 {
     private:
         pose            robot;
+        const int       angle_zero_lidar_to_front;
         VSearchObjects  TriangulateObjects;
         VFiltros        SectionsFilters;
         VVPolars        Vclusters;
         bool            robot_localised;
 
     public:
-        LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p);
+        LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p,int zero);
         ~LidarHandler();
         
         uahr_msgs::PolarArray   Vpubrobots;
@@ -34,16 +35,17 @@ class LidarHandler
 
 
 // Constructor
-LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p)
-: TriangulateObjects{ObjetosBusqueda}, robot{p}
+LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p,int zero)
+: TriangulateObjects{ObjetosBusqueda}, robot{p},angle_zero_lidar_to_front{zero}
 {
     // Reservo la cantidad de memoria
     this->SectionsFilters.reserve(6); 
     this->Vclusters.reserve(15);
-
     this->Vpubrobots.array.reserve(10);
     this->Vpubtriangulate.array.reserve(ObjetosBusqueda.size());
 
+    this->robot.theta = M180(robot.theta-zero);
+    
     // TODO: NO QUIERO HACER ESTO PERO
     // EL FILL NO ME ESTA CAMBIANDO EL
     // SIZE DEL VECTOR :(
@@ -54,10 +56,15 @@ LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p)
     }
 
     //std::fill(Vpubtriangulate.array.begin(),Vpubtriangulate.array.end(),aux);
+    
 
     this->robot_localised = false;
     // Cálculamos los nuevos filtros
     UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);
+    for (auto & obj : TriangulateObjects)
+    {
+        obj.rpose = obj.theoric_rpose;
+    }
     prompt_filters();
 }
 
@@ -66,7 +73,7 @@ void LidarHandler::cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
     // Actualizo la posición del robot:
     this->robot.x = msg->x;
     this->robot.y = msg->y;
-    this->robot.theta = msg->theta; 
+    this->robot.theta = M180(msg->theta - this->angle_zero_lidar_to_front); 
     // Calculamos los nuevos filtros:
     UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);    
     prompt_filters();
@@ -75,10 +82,10 @@ void LidarHandler::cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
 void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count, 
     const float &angle_max, const float &angle_increment)
 {
-    uahr_msgs::Polar aux;
+    //uahr_msgs::Polar aux;
     
     // Limpio los vectores:
-    std::fill(Vpubtriangulate.array.begin(),Vpubtriangulate.array.end(),aux);
+    //std::fill(Vpubtriangulate.array.begin(),Vpubtriangulate.array.end(),aux);
     this->Vpubrobots.array.clear();
     this->Vclusters.clear();
 
@@ -99,6 +106,7 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
         this->Vclusters,
         this->Vpubtriangulate,
         this->Vpubrobots);
+
     //prompt_scans();
     //prompt_filters();
 }
@@ -112,7 +120,8 @@ void LidarHandler::prompt_filters()
 
     for (auto & objeto : TriangulateObjects)
     {
-        std::cout<<"Objeto ID: "<<objeto.id<<" Angle "<< objeto.rpose.angle <<" Dist "<<objeto.rpose.dist<<std::endl;
+        std::cout<<"Objeto ID: "<<objeto.id<<"Real Angle "<< objeto.rpose.angle <<" Real Dist "<<objeto.rpose.dist<<std::endl;
+        std::cout<<"Objeto ID: "<<objeto.id<<"Theoric Angle "<< objeto.theoric_rpose.angle <<" Real Dist "<<objeto.theoric_rpose.dist<<std::endl;
     }
     
 
@@ -133,6 +142,13 @@ void LidarHandler::prompt_scans()
         std::cout<<"Angulo "<<objeto.angle<<" Distancia "<<objeto.dist<<std::endl;
         
     }
+}
+
+void restet_server()
+{
+    int a;
+
+
 }
 
 
