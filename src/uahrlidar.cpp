@@ -16,6 +16,8 @@
 #include "uahr_msgs/PolarArray.h"
 #include "uahr_msgs/Arco_Interes.h"
 #include "uahr_msgs/array_arcos.h"
+#include "std_srvs/Empty.h"
+
 
 #include <math.h>
 #include "uahr_class.hpp"
@@ -52,10 +54,8 @@ void publish_scan(ros::Publisher *pub_robots,
 {    
     bool  reversed = (angle_max > angle_min);
     float angle_increment;
-    float angulo;
     int   cluster = 0;
     float aux;
-    static int flag= 0;
 
 
     if (reversed) {
@@ -75,6 +75,7 @@ void publish_scan(ros::Publisher *pub_robots,
     // Analiza los datos:
     if (!reverse_data) {
         // Calculo el ángulo
+        float angulo;
         for (size_t i = 0; i < node_count; i++) {
             angulo = angle_min + angle_increment * i;
         }
@@ -234,6 +235,7 @@ int main(int argc, char * argv[])
     ros::Publisher  pub_robots = nh.advertise<uahr_msgs::PolarArray>("lidar_robots", 1000);
     ros::Publisher  pub_objs   = nh.advertise<uahr_msgs::PolarArray>("lidar_distance", 1000);
     ros::Publisher  pub_arcos  = nh.advertise<uahr_msgs::array_arcos>("arcos", 1000);;
+    ros::ServiceServer restet_service = nh.advertiseService("reset_rplidar", &LidarHandler::reset_tracks,&Handler);
 
 
     ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");

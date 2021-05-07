@@ -3,6 +3,8 @@
 #include "uahr_filters.hpp"
 #include "uahr_types.hpp"
 #include "uahr_common.hpp"
+#include "std_srvs/Empty.h"
+
 #define MIN_DIST_ROBOT 100
 
 
@@ -24,11 +26,15 @@ class LidarHandler
         uahr_msgs::PolarArray   Vpubtriangulate; 
 
         void cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg);
-        void new_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
+        void new_scan
+        (rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
         const float &angle_max, const float &angle_increment);
-        
+        bool reset_tracks(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response);
+
+
         void prompt_filters();        
         void prompt_scans();
+
 
         //uahr_msgs::array_arcos  pub_filters();
 };
@@ -144,11 +150,13 @@ void LidarHandler::prompt_scans()
     }
 }
 
-void restet_server()
+bool LidarHandler::reset_tracks(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
-    int a;
-
-
+    for (auto & obj : TriangulateObjects)
+    {
+        obj.rpose = obj.theoric_rpose;
+    }
+    return true;
 }
 
 
