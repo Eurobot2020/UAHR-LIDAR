@@ -39,7 +39,7 @@ void RPLidarScanToCluster(rplidar_response_measurement_node_hq_t *nodes,size_t n
             distance = (float) nodes[i].dist_mm_q2/4.0f;
             if(InSection(distance,distance_limits))
             {
-                cluster_find =false;
+                cluster_find = false;
                 
                 // Recorro los clusters hasta que me paso la condición del ángulo
                 for (int j= Vclusters.size()-1;j>=0;j--)
@@ -54,17 +54,16 @@ void RPLidarScanToCluster(rplidar_response_measurement_node_hq_t *nodes,size_t n
                         }   
                     }
                     else 
-                        //std::cout<<"No entro por: "<<angulo-Vclusters[j].back().angle<<std::endl;
-
                         break;
                 }
 
+                // Si no coincide con ningún cluster cercano
+                // se crea un cluster para él.
                 if(!cluster_find)
                 {
                     Vclusters.emplace_back();
                     Vclusters.back().emplace_back(angulo,distance);
                 }
-
             }
         }
         else if((angulo<filtro->start)&&(filtro != Vfiltros.begin()))
@@ -83,11 +82,16 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
     bool  in_the_midle = false;
     std::vector<int> n;
 
+    // TODO: Cambiar esta función entera,
+    // es más fea que pegar a un padre
+
+    // Caso especial:
     if(abs(obj.rpose.angle) >= 170)
     {
         float dist_ang = 0;
         for(int j=0; j<Vclusters.size();j++)
         {
+
             dist_ang = abs(Vclusters[j].angle) - abs(obj.rpose.angle);
             if((InLimits(Vclusters[j].dist,obj.rpose.dist-50,obj.rpose.dist+50))
                 &&
@@ -197,6 +201,9 @@ bool FilterClusterbySize(VPolars & cluster)
 
 polar MeanCluster(VPolars cluster)
 {
+    // TODO: Se podría mejorar
+    // con vectorización y 
+    // mejorando el acceso a cache?
     polar p(0,0);
     for(auto & haz : cluster)
     {
@@ -220,6 +227,7 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
     RPLidarScanToCluster(nodes,node_count,angle_max, angle_increment,
                 Vclusters,Vfiltros,max_distance);
     
+
     // Hago la media de los cluster sobrantes:
     VPolars medidas_cluster;
     medidas_cluster.reserve(Vclusters.size());
@@ -228,26 +236,29 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
         medidas_cluster.emplace_back(MeanCluster(cluster));
     }
 
+    // Si hay clusters:
     if(medidas_cluster.size())
     {
         uahr_msgs::Polar aux_polar;
         float adiff;
         float ddiff;
 
-        // Asocia la distancia de cada cluster con un objeto:
+        // TODO: Molaría que se pudiera confirmar los robots
+        // e intentar trackearlos:
+        
+        // Intento buscar los objetos estáticos entre los clusters:
         std::for_each(SearchObjects.begin(),SearchObjects.end(),[&](ObjSearchData & obj)
         {
             aux_polar = AssingClustertoObject(obj,medidas_cluster);
             ddiff = abs(aux_polar.dist - Vpubposes.array[obj.id].dist);
             adiff = abs(aux_polar.angle - Vpubposes.array[obj.id].angle);
 
-
+            // Si hemos encontrado el objeto publicamos su posición
             if(obj.tracked)
             {
-                // Lo mas importante es el ángulo
+                // Fitlro antiruido para evitar
                 if(!(((adiff <3) || (adiff>177))  && ddiff<30))
                 {
-                    std::cout<<"La diferencia angular "<<adiff<<" la de distancia "<<ddiff<<std::endl;
                     Vpubposes.array[obj.id] = aux_polar;
                 }
     
@@ -260,6 +271,7 @@ void AnalyzeScan(rplidar_response_measurement_node_hq_t *nodes, size_t node_coun
             }
         });
         
+        // Los cluster que no son objetos son robots
         for (auto & cluster : medidas_cluster)
         {
             aux_polar.angle = cluster.angle;

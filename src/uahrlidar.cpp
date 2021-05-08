@@ -54,7 +54,6 @@ void publish_scan(ros::Publisher *pub_robots,
 {    
     bool  reversed = (angle_max > angle_min);
     float angle_increment;
-    int   cluster = 0;
     float aux;
 
 
@@ -74,6 +73,8 @@ void publish_scan(ros::Publisher *pub_robots,
         
     // Analiza los datos:
     if (!reverse_data) {
+        // TODO: Aunque es imposible que se de esta 
+        // condición empiricamente, habría que preparala.
         // Calculo el ángulo
         float angulo;
         for (size_t i = 0; i < node_count; i++) {
@@ -143,8 +144,10 @@ static float getAngle(const rplidar_response_measurement_node_hq_t& node)
 
 int main(int argc, char * argv[]) 
 {
+    // Inicio el nodo
     ros::init(argc, argv, "rplidar_node");
     
+    // Recojo todos los parámetros
     std::string channel_type;
     std::string tcp_ip;
     std::string serial_port;
@@ -156,6 +159,9 @@ int main(int argc, char * argv[])
     int angle_compensate_multiple = 1;//it stand of angle compensate at per 1 degree
     std::string scan_mode;
 
+    // TODO: Aqui hay parámtetros que estan
+    // en el driver pero ya no se utilizan
+    // habría que limpiarlo.
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");
     nh_private.param<std::string>("channel_type", channel_type, "serial");
@@ -169,7 +175,6 @@ int main(int argc, char * argv[])
     
     std::string name_l; 
     std::string name_m; 
-
     std::string name_x;
     std::string name_y;
     std::string name_a;
@@ -177,9 +182,7 @@ int main(int argc, char * argv[])
     std::string modo;
     std::string name_zero;
 
-    int fil_angular[4] {FA+10,FA+10,FA/2,FA};
     std::vector<ObjSearchData> lfobjects;
-
     std::vector<int> ejemplos_list;
     int px;
     int py;
@@ -189,7 +192,7 @@ int main(int argc, char * argv[])
     struct pose robot;
     ros::Subscriber sub_pose;
     
-
+    // TODO: Mejorar a la hora de recoger parámetros
     // Parametros euroboteros
     if( nh.searchParam("pose_x",name_x) 
         &&
@@ -214,7 +217,7 @@ int main(int argc, char * argv[])
         robot.y = py;
         robot.theta = ptheta;
     
-        // TODO QUITAR ESTO Y HACER ALGO BUENO CON LOS YAMLS
+        // TODO: QUITAR ESTO Y HACER ALGO BUENO CON LOS YAMLS
         for(int j=0; j<=6; j=j+2)
         {
             lfobjects.push_back(ObjSearchData{ejemplos_list[j],ejemplos_list[j+1],j/2});
@@ -228,22 +231,26 @@ int main(int argc, char * argv[])
         ros::shutdown();
     }
 
+    
+    // Creo la clase que va a gestionar los datos
+    // durante el partido.
     class LidarHandler Handler(lfobjects,robot,zero);
     sub_pose   = nh.subscribe("pose", 1000, &LidarHandler::cb_pose,&Handler);
 
-    // Eurobot publishers:
+    // Creo publishers:
     ros::Publisher  pub_robots = nh.advertise<uahr_msgs::PolarArray>("lidar_robots", 1000);
     ros::Publisher  pub_objs   = nh.advertise<uahr_msgs::PolarArray>("lidar_distance", 1000);
     ros::Publisher  pub_arcos  = nh.advertise<uahr_msgs::array_arcos>("arcos", 1000);;
     ros::ServiceServer restet_service = nh.advertiseService("reset_rplidar", &LidarHandler::reset_tracks,&Handler);
 
-
+    // Prompt si todo va bien:
     ROS_INFO("Paquete modificado de rplidar_ros por el UAH ROBOTICS TEAM");
-    ROS_INFO("Configure finish");
-    Handler.prompt_filters();
+    ROS_INFO("Configuration finish");
     
 
-
+    // A partir de aqui el código pertenece al driver
+    // de Slamtec, la única modificación de ahora en 
+    // adelante es la función publish scan:
     u_result     op_result;
 
 

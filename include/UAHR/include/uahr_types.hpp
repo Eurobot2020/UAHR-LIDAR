@@ -15,6 +15,9 @@
 #define AMBOS   'A'
 #define FA       15
 #define FD       0.1  
+// TODO: Comprobar si muchos de los tipos
+// se pueden cambiar a datos más pequeños
+// seguro que se puede.
 // Estructuras
 struct polar 
 {

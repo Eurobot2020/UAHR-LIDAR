@@ -188,7 +188,6 @@ void ObjectsAngles(const pose &p_obs,ObjSearchData &pasive_obj,VFiltros &vf)
 void AcoploAngulos(VFiltros &Vf)
 {   
     int i = 0;
-    float aux_angle;
 
     // TODO
     // Podria intentar ser más rapida si cambiamos el erase.

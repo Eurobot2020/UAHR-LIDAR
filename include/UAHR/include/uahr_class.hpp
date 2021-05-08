@@ -42,9 +42,11 @@ class LidarHandler
 
 // Constructor
 LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p,int zero)
-: TriangulateObjects{ObjetosBusqueda}, robot{p},angle_zero_lidar_to_front{zero}
+: robot{p},angle_zero_lidar_to_front{zero},TriangulateObjects{ObjetosBusqueda}
 {
     // Reservo la cantidad de memoria
+    // TODO: Hay que contar cuanto todos estos vectores 
+    // tras un partido, para evitar relocalización y copias.
     this->SectionsFilters.reserve(6); 
     this->Vclusters.reserve(15);
     this->Vpubrobots.array.reserve(10);
@@ -56,7 +58,7 @@ LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p,int
     // EL FILL NO ME ESTA CAMBIANDO EL
     // SIZE DEL VECTOR :(
     uahr_msgs::Polar aux;
-    for(int i = 0; i<ObjetosBusqueda.size();i++)
+    for(std::size_t i = 0; i<ObjetosBusqueda.size();i++)
     {
         Vpubtriangulate.array.emplace_back(aux);
     }
@@ -67,11 +69,13 @@ LidarHandler::LidarHandler(std::vector<ObjSearchData> ObjetosBusqueda,pose p,int
     this->robot_localised = false;
     // Cálculamos los nuevos filtros
     UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);
+    // Como no hay enemigos trackeados
+    // inicializo todos las direcciones
+    // al teórico:
     for (auto & obj : TriangulateObjects)
     {
         obj.rpose = obj.theoric_rpose;
     }
-    prompt_filters();
 }
 
 void LidarHandler::cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
@@ -82,7 +86,6 @@ void LidarHandler::cb_pose(const geometry_msgs::Pose2D::ConstPtr& msg)
     this->robot.theta = M180(msg->theta - this->angle_zero_lidar_to_front); 
     // Calculamos los nuevos filtros:
     UpdateFilters(this->robot_localised,this->SectionsFilters,this->robot,this->TriangulateObjects);    
-    prompt_filters();
 }
 
 void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count, 
@@ -91,7 +94,6 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
     //uahr_msgs::Polar aux;
     
     // Limpio los vectores:
-    //std::fill(Vpubtriangulate.array.begin(),Vpubtriangulate.array.end(),aux);
     this->Vpubrobots.array.clear();
     this->Vclusters.clear();
 
@@ -99,8 +101,6 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
     Seccion search_distance;
     search_distance.start = MIN_DIST_ROBOT;
     search_distance.end = biggest_distance_corner(this->robot);
-
-    
 
     // Calculamos los nuevos filtros:
     AnalyzeScan(nodes, node_count,
@@ -112,10 +112,17 @@ void LidarHandler::new_scan(rplidar_response_measurement_node_hq_t *nodes, size_
         this->Vclusters,
         this->Vpubtriangulate,
         this->Vpubrobots);
-
-    //prompt_scans();
-    //prompt_filters();
 }
+
+bool LidarHandler::reset_tracks(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
+{
+    for (auto & obj : TriangulateObjects)
+    {
+        obj.rpose = obj.theoric_rpose;
+    }
+    return true;
+}
+
 
 void LidarHandler::prompt_filters()
 {
@@ -129,8 +136,6 @@ void LidarHandler::prompt_filters()
         std::cout<<"Objeto ID: "<<objeto.id<<"Real Angle "<< objeto.rpose.angle <<" Real Dist "<<objeto.rpose.dist<<std::endl;
         std::cout<<"Objeto ID: "<<objeto.id<<"Theoric Angle "<< objeto.theoric_rpose.angle <<" Real Dist "<<objeto.theoric_rpose.dist<<std::endl;
     }
-    
-
 }
 
 void LidarHandler::prompt_scans()
@@ -150,14 +155,6 @@ void LidarHandler::prompt_scans()
     }
 }
 
-bool LidarHandler::reset_tracks(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
-{
-    for (auto & obj : TriangulateObjects)
-    {
-        obj.rpose = obj.theoric_rpose;
-    }
-    return true;
-}
 
 
 /*
