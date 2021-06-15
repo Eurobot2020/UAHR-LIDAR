@@ -1,5 +1,7 @@
-objetos_busqueda_sucio: [1550,900, 1550, -900,-1550, 0, 0, 1000]
-objetos_triangulacion: [["Baliza_arriba",1550, 900], ["Baliza_abajo",1550, -900],["Baliza_intermedia",-1550, 0],["Torre", 0,  1000]]
+objetos_busqueda_sucio: [-1550,900, -1550, -900,1550, 0, 0, 1000]
+#objetos_busqueda_sucio: [1550,900, 1550, -900,-1550, 0, 0, 1000]
+#objetos_triangulacion: [["Baliza_arriba",1550, 900], ["Baliza_abajo",1550, -900],["Baliza_intermedia",-1550, 0],["Torre", 0,  1000]]
+objetos_triangulacion: [["Baliza_arriba",-1550, 900], ["Baliza_abajo",-1550, -900],["Baliza_intermedia",1550, 0],["Torre", 0,  1000]]
 objetos_eliminables: [["Estanteria_aliada",600, 950], ["Estanteria_enemiga",-600, 950]]
 
 

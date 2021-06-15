@@ -95,7 +95,7 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
             dist_ang = abs(Vclusters[j].angle) - abs(obj.rpose.angle);
             if((InLimits(Vclusters[j].dist,obj.rpose.dist-50,obj.rpose.dist+50))
                 &&
-                (InLimits(dist_ang, -10, 10)))
+                (InLimits(dist_ang, -15, 15)))
             {
                 // TODO: Es esto una buena forma de medir?
                 difference = abs((Vclusters[j].angle - obj.rpose.angle) * 
@@ -137,7 +137,7 @@ uahr_msgs::Polar AssingClustertoObject(ObjSearchData  &obj,VPolars &Vclusters)
             }
             else
             {
-                if((InLimits(Vclusters[j].angle, obj.rpose.angle-10,obj.rpose.angle+10)
+                if((InLimits(Vclusters[j].angle, obj.rpose.angle-15,obj.rpose.angle+15)
                 &&
                 Vclusters[j].dist < obj.rpose.dist+100))
                 {    

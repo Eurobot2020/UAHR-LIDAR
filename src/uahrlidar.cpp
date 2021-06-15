@@ -216,9 +216,8 @@ int main(int argc, char * argv[])
         robot.x = px;
         robot.y = py;
         robot.theta = ptheta;
-    
         // TODO: QUITAR ESTO Y HACER ALGO BUENO CON LOS YAMLS
-        for(int j=0; j<=6; j=j+2)
+        for(int j=0; j<=ejemplos_list.size()-2;j=j+2)
         {
             lfobjects.push_back(ObjSearchData{ejemplos_list[j],ejemplos_list[j+1],j/2});
         }
