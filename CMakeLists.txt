@@ -19,17 +19,16 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rosconsole
   sensor_msgs
-  std_msgs
-  geometry_msgs
   #rostest
   )
 
 include_directories(
   ${RPLIDAR_SDK_PATH}/include
   ${RPLIDAR_SDK_PATH}/src
+  ${catkin_INCLUDE_DIRS}
+
   #${UAHR_PATH}/src
   #${UAHR_PATH}/include
-  ${catkin_INCLUDE_DIRS}
 )
 catkin_package()
 
