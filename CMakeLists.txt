@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(uahr_lidar)
 
 set(RPLIDAR_SDK_PATH "./include/sdk/")
-set(UAHR_PATH "./include/UAHR/")
+#set(UAHR_PATH "./include/UAHR/")
 
 FILE(GLOB RPLIDAR_SDK_SRC 
   "${RPLIDAR_SDK_PATH}/src/arch/linux/*.cpp"
@@ -10,9 +10,9 @@ FILE(GLOB RPLIDAR_SDK_SRC
   "${RPLIDAR_SDK_PATH}/src/*.cpp"
 )
 
-FILE(GLOB UAHR_SRC 
-  "${UAHR_PATH}/src/*.cpp"
-)
+#FILE(GLOB UAHR_SRC 
+#  "${UAHR_PATH}/src/*.cpp"
+#)
 
 #find_package(catkin REQUIRED COMPONENTS
 find_package(catkin REQUIRED COMPONENTS
@@ -28,15 +28,15 @@ find_package(catkin REQUIRED COMPONENTS
 include_directories(
   ${RPLIDAR_SDK_PATH}/include
   ${RPLIDAR_SDK_PATH}/src
-  ${UAHR_PATH}/src
-  ${UAHR_PATH}/include
+  #${UAHR_PATH}/src
+  #${UAHR_PATH}/include
   ${catkin_INCLUDE_DIRS}
 )
 catkin_package()
 
-add_executable(uahr_lidar_node src/uahrlidar.cpp ${RPLIDAR_SDK_SRC} ${UAHR_SRC})
-target_compile_options (uahr_lidar_node PRIVATE -Wall -pedantic)
-target_link_libraries(uahr_lidar_node ${catkin_LIBRARIES})
+#add_executable(uahr_lidar_node src/uahrlidar.cpp ${RPLIDAR_SDK_SRC} ${UAHR_SRC})
+#target_compile_options (uahr_lidar_node PRIVATE -Wall -pedantic)
+#target_link_libraries(uahr_lidar_node ${catkin_LIBRARIES})
 
 add_executable(rplidarNode src/node.cpp ${RPLIDAR_SDK_SRC})
 target_link_libraries(rplidarNode ${catkin_LIBRARIES})
