@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   geometry_msgs
-  rostest
+  #rostest
   )
 
 include_directories(
@@ -43,7 +43,7 @@ target_link_libraries(rplidarNode ${catkin_LIBRARIES})
 add_executable(rplidarNodeClient src/client.cpp)
 target_link_libraries(rplidarNodeClient ${catkin_LIBRARIES})
 
-install(TARGETS uahr_lidar_node  rplidarNode rplidarNodeClient
+install(TARGETS rplidarNode rplidarNodeClient uahr_lidar_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
