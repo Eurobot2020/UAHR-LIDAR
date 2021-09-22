@@ -2,10 +2,11 @@
 <package>
   <name>uahr_lidar</name>
   <version>1.10.0</version>
-  <description>UAHR lidar package, usefull package for Eurobo2020. Its a fork of rplidar ros package, support rplidar A2/A1 and A3/S1</description>
+  <description>The rplidar ros package, support rplidar A2/A1 and A3/S1</description>
 
-  <maintainer email="robotics@uah.es">Slamtec ROS Maintainer</maintainer>
+  <maintainer email="ros@slamtec.com">Slamtec ROS Maintainer</maintainer>
   <license>BSD</license>
+
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rosconsole</build_depend>
