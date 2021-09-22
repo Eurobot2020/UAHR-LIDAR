@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(uahr_lidar)
 
-set(RPLIDAR_SDK_PATH "./include/sdk/")
-#set(UAHR_PATH "./include/UAHR/")
+set(RPLIDAR_SDK_PATH "./sdk/")
 
 FILE(GLOB RPLIDAR_SDK_SRC 
   "${RPLIDAR_SDK_PATH}/src/arch/linux/*.cpp"
@@ -10,31 +9,19 @@ FILE(GLOB RPLIDAR_SDK_SRC
   "${RPLIDAR_SDK_PATH}/src/*.cpp"
 )
 
-#FILE(GLOB UAHR_SRC 
-#  "${UAHR_PATH}/src/*.cpp"
-#)
-
-#find_package(catkin REQUIRED COMPONENTS
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rosconsole
   sensor_msgs
-  #rostest
-  )
+)
 
 include_directories(
   ${RPLIDAR_SDK_PATH}/include
   ${RPLIDAR_SDK_PATH}/src
   ${catkin_INCLUDE_DIRS}
-
-  #${UAHR_PATH}/src
-  #${UAHR_PATH}/include
 )
-catkin_package()
 
-#add_executable(uahr_lidar_node src/uahrlidar.cpp ${RPLIDAR_SDK_SRC} ${UAHR_SRC})
-#target_compile_options (uahr_lidar_node PRIVATE -Wall -pedantic)
-#target_link_libraries(uahr_lidar_node ${catkin_LIBRARIES})
+catkin_package()
 
 add_executable(rplidarNode src/node.cpp ${RPLIDAR_SDK_SRC})
 target_link_libraries(rplidarNode ${catkin_LIBRARIES})
@@ -42,7 +29,7 @@ target_link_libraries(rplidarNode ${catkin_LIBRARIES})
 add_executable(rplidarNodeClient src/client.cpp)
 target_link_libraries(rplidarNodeClient ${catkin_LIBRARIES})
 
-install(TARGETS rplidarNode rplidarNodeClient #uahr_lidar_node
+install(TARGETS rplidarNode rplidarNodeClient
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -52,6 +39,3 @@ install(DIRECTORY launch rviz sdk
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )
-
-#catkin_add_gtest(lidarlibtest test/LidarLib.cpp ${UAHR_SRC})
-#target_link_libraries(lidarlibtest ${catkin_LIBRARIES})
